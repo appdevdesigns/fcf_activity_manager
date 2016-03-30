@@ -3,6 +3,7 @@ steal(
 	// List your Controller's dependencies here:
 	'opstools/FCFActivityManager/views/FCFActivityManager/FCFActivityManager.ejs',
 	        'opstools/FCFActivityManager/controllers/crud1FCFActivity.js',
+            'opstools/FCFActivityManager/controllers/crud1FCFActivityImages.js',
     function(){
 		System.import('appdev').then(function() {
 			steal.import('appdev/ad',
@@ -36,6 +37,7 @@ steal(
                             var _this = this;
 
                             var webixCrudControllers = {
+                "opstools.FCFActivityManager.crud1FCFActivityImages" : { el:".crud1FCFActivityImages", opt:{} },
                 "opstools.FCFActivityManager.crud1FCFActivity" : { el:".crud1FCFActivity", opt:{} }
                             }
 
