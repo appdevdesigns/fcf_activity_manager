@@ -36,7 +36,7 @@ module.exports = {
 
         // this is expected to be running the /assets directory
 
-        // build command:  ./cjs steal/buildjs OpsPortal opstools/FcfActivityManager
+        // build command:  ./cjs steal/buildjs OpsPortal opstools/FCFActivityManager
 
 
         //// NOTE: the build command will attempt to rebuild OpsPortal/production.[js,css].  We don't
@@ -62,25 +62,25 @@ module.exports = {
             // step 2:  build js files
             function (next) {
 
-                AD.log('<green>building</green> opstools/FcfActivityManager JS files');
+                AD.log('<green>building</green> opstools/FCFActivityManager JS files');
 
                 // Minify js/ejs files
                 transform({
-                    main: path.join('opstools', 'FcfActivityManager', 'FcfActivityManager'),
+                    main: path.join('opstools', 'FCFActivityManager', 'FCFActivityManager'),
                     config: "stealconfig.js"
                 }, {
                         minify: true,
                         ignore: [
                             /^.*(.css)+/, // Ignore css files
-                            /^(?!opstools\/FcfActivityManager.*)/, // Ignore all are not plugin scripts
+                            /^(?!opstools\/FCFActivityManager.*)/, // Ignore all are not plugin scripts
                         ]
                     }).then(function (transform) {
                         // Get the main module and it's dependencies as a string
                         var main = transform();
 
-                        fs.writeFile(path.join('opstools', 'FcfActivityManager', 'production.js'), main.code, "utf8", function (err) {
+                        fs.writeFile(path.join('opstools', 'FCFActivityManager', 'production.js'), main.code, "utf8", function (err) {
                             if (err) {
-                                AD.log.error('<red>could not write minified opstools/FcfActivityManager JS file !</red>');
+                                AD.log.error('<red>could not write minified opstools/FCFActivityManager JS file !</red>');
                                 next(err);
                             }
 
@@ -88,31 +88,31 @@ module.exports = {
                         });
                     })
                     .catch(function (err) {
-                        AD.log.error('<red>could not complete opstools/FcfActivityManager JS build!</red>', err);
+                        AD.log.error('<red>could not complete opstools/FCFActivityManager JS build!</red>', err);
                         next(err);
                     });
             },
 
             // step 3:  build css files
             function (next) {
-                AD.log('<green>building</green> opstools/FcfActivityManager CSS files');
+                AD.log('<green>building</green> opstools/FCFActivityManager CSS files');
 
                 // Minify css files
                 transform({
-                    main: path.join('opstools', 'FcfActivityManager', 'FcfActivityManager'),
+                    main: path.join('opstools', 'FCFActivityManager', 'FCFActivityManager'),
                     config: "stealconfig.js"
                 }, {
                         minify: true,
                         ignore: [
                             /^(?!.*(.css)+)/, // Get only css files
-                            /^(?!opstools\/FcfActivityManager.*)/, // Ignore all are not plugin scripts
+                            /^(?!opstools\/FCFActivityManager.*)/, // Ignore all are not plugin scripts
                         ]
                     }).then(function (transform) {
                         var main = transform();
 
-                        fs.writeFile(path.join('opstools', 'FcfActivityManager', 'production.css'), main.code, "utf8", function (err) {
+                        fs.writeFile(path.join('opstools', 'FCFActivityManager', 'production.css'), main.code, "utf8", function (err) {
                             if (err) {
-                                AD.log.error('<red>could not write minified opstools/FcfActivityManager CSS file !</red>');
+                                AD.log.error('<red>could not write minified opstools/FCFActivityManager CSS file !</red>');
                                 next(err);
                             }
 
@@ -120,7 +120,7 @@ module.exports = {
                         });
                     })
                     .catch(function (err) {
-                        AD.log.error('<red>could not complete opstools/FcfActivityManager CSS build!</red>', err);
+                        AD.log.error('<red>could not complete opstools/FCFActivityManager CSS build!</red>', err);
                         next(err);
                     });
             },
@@ -141,7 +141,7 @@ module.exports = {
             function(next) {
 
                 var patches = [
-                    { file:path.join('opstools', 'FcfActivityManager', 'production.js'), tag:'packages/OpsPortal-FcfActivityManager.js', replace:'OpsPortal/production.js'}
+                    { file:path.join('opstools', 'FCFActivityManager', 'production.js'), tag:'packages/OpsPortal-FCFActivityManager.js', replace:'OpsPortal/production.js'}
                 ];
 
                 builder.patchFile(patches, next);
