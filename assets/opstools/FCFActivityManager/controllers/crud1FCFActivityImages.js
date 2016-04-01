@@ -135,12 +135,12 @@ steal(
                                             id:     _this.idTable,
                                             pager:  _this.idPagerA,
                                             columns:[
-                                                {"id":"caption","header":"caption","editor":"text","fillspace":true},
-                                                {"id":"image","header":"image","editor":"text"},
-                                                {"id":"date","header":"date"},
-                                                {"id":"uploadedBy","header":"uploadedBy"},
-                                                {"id":"activity","header":"activity"},
-                                                {"id":"status","header":"status","editor":"text","fillspace":true},
+                                                {"id":"activity","header":"Activity"},
+                                                {"id":"image","header":"Image","editor":"text","template":"<div><img src='/data/fcf/images/activities/#image#' /></div>"},
+                                                {"id":"caption","header":"Caption","editor":"text","fillspace":true},
+                                                {"id":"status","header":"Status","editor":"text","fillspace":true},
+                                                {"id":"date","header":"Date"},
+                                                {"id":"uploadedBy","header":"Uploaded by"},
                                 
                                                 // { id:"copy",  header:"" , width:40, css:{"text-align":"center"}, template:function(obj) { return "<div class='clone fa fa-copy fa-2 offset-9 rbac-role-list-clone' role-id='"+obj.id+"'  ></div>"; } } ,
                                                 { id:"trash", header:"" , width:40, css:{"text-align":"center"}, template:"<span class='trash'>{common.trashIcon()}</span>"}
