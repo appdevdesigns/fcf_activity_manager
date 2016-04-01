@@ -136,7 +136,7 @@ steal(
                                             pager: _this.idPagerA,
                                             columns: [
                                                 { "id": "activity", "header": "Activity" },
-                                                { "id": "image", "header": "Image", "editor": "text", "template": "<div><img src='#image#' /></div>" },
+                                                { "id": "image", "header": "Image", "editor": "text", "template": "<div><img src='#image#' class='openImage' width='150' /></div>", "width": 150 },
                                                 { "id": "caption", "header": "Caption", "editor": "text", "fillspace": true },
                                                 { "id": "status", "header": "Status", "editor": "text", "fillspace": true },
                                                 { "id": "date", "header": "Date", "width": 100 },
@@ -181,6 +181,30 @@ steal(
                                             },
 
                                             onClick: {
+												openImage: function(e, id, trg) {
+													var imageUrl = $$(_this.idTable).getItem(id)[id.column];
+
+													webix.ui({
+														id: "image_popup",
+														view: "window",
+														position: "center",
+														head: {
+															view: "toolbar", cols: [
+																{ view: "label", label: id.column + ' image' },
+																{ view: "button", label: "X", width: 70, click: ("$$('image_popup').close();") }
+															]
+														},
+														body: {
+															template: '<img src="' + imageUrl + '" width="680" />'
+														},
+														modal: true,
+														resize: true,
+														height: 500,
+														width: 700,
+													}).show();
+
+													return false;
+												},
 												openData: function(e, id, trg) {
 													var data = JSON.stringify($$(_this.idTable).getItem(id)[id.column]);
 

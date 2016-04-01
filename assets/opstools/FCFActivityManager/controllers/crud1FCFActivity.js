@@ -136,11 +136,11 @@ steal(
                                             pager: _this.idPagerA,
                                             columns: [
                                                 { "id": "id", "header": "id" },
-                                                { "id": "default_image", "header": "Default Image", "editor": "text", "template": "<div><img src='/data/fcf/images/activities/#default_image#' /></div>" },
-                                                { "id": "team", "header": "Team" },
+                                                { "id": "default_image", "header": "Default Image", "editor": "text", "template": "<img src='/data/fcf/images/activities/#default_image#' class='openImage' width='150' />", "width": 150 },
                                                 { "id": "status", "header": "Status", "editor": "text", "fillspace": true },
-                                                { "id": "createdBy", "header": "Created by", "template": "#createdBy# <span class='openData webix_icon fa-folder-open'></span>", "width": 140 },
                                                 { "id": "approvedBy", "header": "Approved by" },
+                                                { "id": "team", "header": "Team", "template": "#team# <span class='openData webix_icon fa-folder-open'></span>", "width": 140 },
+                                                { "id": "createdBy", "header": "Created by", "template": "#createdBy# <span class='openData webix_icon fa-folder-open'></span>", "width": 140 },
                                                 { "id": "date_start", "header": "Start date", "width": 200 },
                                                 { "id": "date_end", "header": "End date", "width": 200 },
                                                 { "id": "createdAt", "header": "Created at", "width": 200 },
@@ -185,6 +185,30 @@ steal(
                                             },
 
                                             onClick: {
+												openImage: function(e, id, trg) {
+													var imageUrl = '/data/fcf/images/activities/' + $$(_this.idTable).getItem(id)[id.column];
+
+													webix.ui({
+														id: "image_popup",
+														view: "window",
+														position: "center",
+														head: {
+															view: "toolbar", cols: [
+																{ view: "label", label: id.column + ' image' },
+																{ view: "button", label: "X", width: 70, click: ("$$('image_popup').close();") }
+															]
+														},
+														body: {
+															template: '<img src="' + imageUrl + '" width="680" />'
+														},
+														modal: true,
+														resize: true,
+														height: 500,
+														width: 700,
+													}).show();
+
+													return false;
+												},
 												openData: function(e, id, trg) {
 													var data = JSON.stringify($$(_this.idTable).getItem(id)[id.column]);
 
