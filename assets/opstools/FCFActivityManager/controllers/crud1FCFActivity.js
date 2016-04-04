@@ -139,8 +139,14 @@ steal(
                                                 { "id": "default_image", "header": "Default Image", "editor": "text", "template": "<img src='/data/fcf/images/activities/#default_image#' class='openImage' width='150' />", "width": 150 },
                                                 { "id": "status", "header": "Status", "editor": "text", "fillspace": true },
                                                 { "id": "approvedBy", "header": "Approved by" },
-                                                { "id": "team", "header": "Team", "template": "#team# <span class='openData webix_icon fa-folder-open'></span>", "width": 140 },
-                                                { "id": "createdBy", "header": "Created by", "template": "#createdBy# <span class='openData webix_icon fa-folder-open'></span>", "width": 140 },
+                                                { "id": "team", "header": "Team", "width": 140, "template": function(r) { 
+													return r.MinistryDisplayName ? r.MinistryDisplayName : '';
+												} },
+                                                { "id": "createdBy", "header": "Created by", "width": 200, "template": function(r) { 
+													return (r.createdBy.NameFirstEng ? r.createdBy.NameFirstEng + ' ' : '') +
+															(r.createdBy.NameMiddleEng ? r.createdBy.NameMiddleEng + ' ' : '') +
+															(r.createdBy.NameLastEng ? r.createdBy.NameLastEng + ' ' : '');
+												} },
                                                 { "id": "date_start", "header": "Start date", "width": 200 },
                                                 { "id": "date_end", "header": "End date", "width": 200 },
                                                 { "id": "createdAt", "header": "Created at", "width": 200 },
@@ -209,29 +215,7 @@ steal(
 
 													return false;
 												},
-												openData: function(e, id, trg) {
-													var data = JSON.stringify($$(_this.idTable).getItem(id)[id.column]);
-
-													webix.ui({
-														id: "data_popup",
-														view: "window",
-														position: "center",
-														head: {
-															view: "toolbar", cols: [
-																{ view: "label", label: id.column + ' data' },
-																{ view: "button", label: "X", width: 70, click: ("$$('data_popup').close();") }
-															]
-														},
-														body: data,
-														modal: true,
-														resize: true,
-														height: 500,
-														width: 700,
-													}).show();
-
-													return false;
-												},
-                                                trash: function(e, id) {
+											    trash: function(e, id) {
 
                                                     var model = _this.dataCollection.AD.getModel(id);
                                                     var lblConfirm = AD.lang.label.getLabel('webix.common.confirmDelete', [model.getLabel()]) || '*Remove : ' + model.getLabel();

@@ -140,7 +140,7 @@ steal(
                                                 { "id": "caption", "header": "Caption", "editor": "text", "fillspace": true },
                                                 { "id": "status", "header": "Status", "editor": "text", "fillspace": true },
                                                 { "id": "date", "header": "Date", "width": 100 },
-                                                { "id": "uploadedBy", "header": "Uploaded by", "template": "#uploadedBy# <span class='openData webix_icon fa-folder-open'></span>", "width": 140 },
+                                                { "id": "uploadedBy", "header": "Uploaded by", "template": "#displayName#", "width": 140 },
 
                                                 // { id:"copy",  header:"" , width:40, css:{"text-align":"center"}, template:function(obj) { return "<div class='clone fa fa-copy fa-2 offset-9 rbac-role-list-clone' role-id='"+obj.id+"'  ></div>"; } } ,
                                                 { id: "trash", header: "", width: 40, css: { "text-align": "center" }, template: "<span class='trash'>{common.trashIcon()}</span>" }
@@ -205,25 +205,6 @@ steal(
 
 													return false;
 												},
-												openData: function(e, id, trg) {
-													var data = JSON.stringify($$(_this.idTable).getItem(id)[id.column]);
-
-													webix.ui({
-														id: "data_popup",
-														view: "window",
-														position: "center",
-														head: {
-															view: "toolbar", cols: [
-																{ view: "label", label: id.column + ' data' },
-																{ view: "button", label: "X", width: 70, click: ("$$('data_popup').close();") }
-															]
-														},
-														body: data,
-														modal: true
-													}).show();
-
-													return false;
-												},
 												trash: function(e, id) {
 
 													var model = _this.dataCollection.AD.getModel(id);
@@ -277,7 +258,7 @@ steal(
 												{ "view": "text", "label": "caption", "name": "caption", "type": "text" },
 												{ "view": "text", "label": "image", "name": "image", "type": "text" },
 												{ "view": "datepicker", "label": "date", "name": "date", "timepicker": false },
-												{ "view": "text", "label": "uploadedBy", "name": "uploadedBy" },
+												{ "view": "textarea", "id": "txt-uploadedBy", "label": "uploadedBy", "name": "uploadedBy" },
 												{ "view": "text", "label": "activity", "name": "activity" },
 												{ "view": "text", "label": "status", "name": "status", "type": "text" }
 												// {
@@ -477,6 +458,10 @@ steal(
 
 							var form = $$(this.idForm);
 							form.clearValidation();
+							
+							// var uploadedByData = JSON.stringify($$("txt-uploadedBy").value);
+							// $$("txt-uploadedBy").setValue(uploadedByData);
+
 							form.show();
 
 							$$(this.idFormButtons).show();
