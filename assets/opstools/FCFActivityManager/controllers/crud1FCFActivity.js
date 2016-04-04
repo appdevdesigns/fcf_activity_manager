@@ -134,10 +134,11 @@ steal(
                                             view: "datatable",
                                             id: _this.idTable,
                                             pager: _this.idPagerA,
+											rowHeight: 100,
                                             columns: [
-                                                { "id": "id", "header": "id" },
-                                                { "id": "default_image", "header": "Default Image", "editor": "text", "template": "<img src='/data/fcf/images/activities/#default_image#' class='openImage' width='150' />", "width": 150 },
-                                                { "id": "status", "header": "Status", "editor": "text", "fillspace": true },
+                                                { "id": "id", "header": "id", "width": 40 },
+                                                { "id": "default_image", "header": "Default Image", "editor": "text", "template": "<img src='/data/fcf/images/activities/#default_image#' class='openImage' width='150' height='100' />", "width": 150 },
+                                                { "id": "status", "header": "Status", "width": 90, "editor": "text", fillspace: true },
                                                 { "id": "approvedBy", "header": "Approved by" },
                                                 { "id": "team", "header": "Team", "width": 140, "template": function(r) { 
 													return r.MinistryDisplayName ? r.MinistryDisplayName : '';
@@ -147,10 +148,10 @@ steal(
 															(r.createdBy.NameMiddleEng ? r.createdBy.NameMiddleEng + ' ' : '') +
 															(r.createdBy.NameLastEng ? r.createdBy.NameLastEng + ' ' : '');
 												} },
-                                                { "id": "date_start", "header": "Start date", "width": 200 },
-                                                { "id": "date_end", "header": "End date", "width": 200 },
-                                                { "id": "createdAt", "header": "Created at", "width": 200 },
-                                                { "id": "updatedAt", "header": "Updated at", "width": 200 },
+                                                { "id": "date_start", "header": "Start date", "format": webix.Date.dateToStr("%Y-%m-%d"), "width": 100 },
+                                                { "id": "date_end", "header": "End date", "format": webix.Date.dateToStr("%Y-%m-%d"), "width": 100 },
+                                                { "id": "createdAt", "header": "Created at", "format": webix.Date.dateToStr("%Y-%m-%d %h:%i"), "width": 160 },
+                                                { "id": "updatedAt", "header": "Updated at", "format": webix.Date.dateToStr("%Y-%m-%d %h:%i"), "width": 160 },
 
                                                 // { id:"copy",  header:"" , width:40, css:{"text-align":"center"}, template:function(obj) { return "<div class='clone fa fa-copy fa-2 offset-9 rbac-role-list-clone' role-id='"+obj.id+"'  ></div>"; } } ,
                                                 { id: "trash", header: "", width: 40, css: { "text-align": "center" }, template: "<span class='trash'>{common.trashIcon()}</span>" }
@@ -444,9 +445,24 @@ steal(
 									// make sure they are all translated.
 									list.forEach(function(l) {
 										if (l.translate) { l.translate(); }
-									})
+
+										// Convert to date object
+										if (l.date_start)
+											l.attr('date_start', moment(l.date_start).toDate());
+
+										if (l.date_end)
+											l.attr('date_end', moment(l.date_end).toDate());
+
+										if (l.createdAt)
+											l.attr('createdAt', moment(l.createdAt).toDate());
+
+										if (l.updatedAt)
+											l.attr('updatedAt', moment(l.updatedAt).toDate());
+									});
+
 									_this.data = list;
 									_this.dataCollection = AD.op.WebixDataCollection(list);
+
 									webix.ready(function() {
 
 										$$(_this.idTable).data.sync(_this.dataCollection);

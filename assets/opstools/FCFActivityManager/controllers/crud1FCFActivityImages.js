@@ -134,11 +134,12 @@ steal(
                                             view: "datatable",
                                             id: _this.idTable,
                                             pager: _this.idPagerA,
+											rowHeight: 100,
                                             columns: [
-                                                { "id": "activity", "header": "Activity" },
-                                                { "id": "image", "header": "Image", "editor": "text", "template": "<div><img src='#image#' class='openImage' width='150' /></div>", "width": 150 },
+                                                { "id": "activity", "header": "Activity", "width": 70 },
+                                                { "id": "image", "header": "Image", "editor": "text", "template": "<div><img src='#image#' class='openImage' width='150' height='100' /></div>", "width": 150 },
                                                 { "id": "caption", "header": "Caption", "editor": "text", "fillspace": true },
-                                                { "id": "status", "header": "Status", "editor": "text", "fillspace": true },
+                                                { "id": "status", "header": "Status", "editor": "text", "width": 110 },
                                                 { "id": "date", "header": "Date", "width": 100 },
                                                 { "id": "uploadedBy", "header": "Uploaded by", "template": "#displayName#", "width": 140 },
 
@@ -458,7 +459,7 @@ steal(
 
 							var form = $$(this.idForm);
 							form.clearValidation();
-							
+
 							// var uploadedByData = JSON.stringify($$("txt-uploadedBy").value);
 							// $$("txt-uploadedBy").setValue(uploadedByData);
 
