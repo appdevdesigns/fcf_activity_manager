@@ -137,7 +137,7 @@ steal(
 											rowHeight: 100,
                                             columns: [
                                                 { "id": "activity", "header": "Activity", "width": 70 },
-                                                { "id": "image", "header": "Image", "editor": "text", "template": "<div><img src='#image#' class='openImage' width='150' height='100' /></div>", "width": 150 },
+                                                { "id": "image", "header": "Image", "editor": "text", "template": "<div><img src='#image#' class='openImage' style='max-width: 150px; max-width: 120px;' /></div>", "width": 150 },
                                                 { "id": "caption", "header": "Caption", "editor": "text", "fillspace": true },
                                                 { "id": "status", "header": "Status", "editor": "text", "width": 110 },
                                                 { "id": "date", "header": "Date", "width": 100 },

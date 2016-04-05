@@ -137,7 +137,7 @@ steal(
 											rowHeight: 100,
                                             columns: [
                                                 { "id": "id", "header": "id", "width": 40 },
-                                                { "id": "default_image", "header": "Default Image", "editor": "text", "template": "<img src='/data/fcf/images/activities/#default_image#' class='openImage' width='150' height='100' />", "width": 150 },
+                                                { "id": "default_image", "header": "Default Image", "editor": "text", "template": "<img src='/data/fcf/images/activities/#default_image#' class='openImage' style='max-width: 150px; max-width: 120px;' />", "width": 150 },
                                                 { "id": "status", "header": "Status", "width": 90, "editor": "text", fillspace: true },
                                                 { "id": "approvedBy", "header": "Approved by" },
                                                 { "id": "team", "header": "Team", "width": 140, "template": function(r) { 
@@ -384,12 +384,12 @@ steal(
                                                             }
                                                         },
                                                         {
-                                                            "view": "spacer"
+                                                            "view": "spacer",
                                                         }
                                                     ]
                                                 },
                                                 {
-                                                    "view": "spacer"
+                                                    "view": "spacer",
                                                 }
                                             ]
                                         }
