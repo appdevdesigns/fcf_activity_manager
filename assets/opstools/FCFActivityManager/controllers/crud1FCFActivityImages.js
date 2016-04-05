@@ -39,6 +39,8 @@ steal(
                             this.idForm = ControllerName + "Form";
                             this.idFormButtons = this.idForm + "Buttons";
 
+                            this.idUploadedBy = this.idForm + "UploadedBy";
+
                             webix.ready(function() {
 
                                 var lblList = AD.lang.label.getLabel('webix.common.list') || 'List*';
@@ -139,7 +141,6 @@ steal(
                                                 { "id": "activity", "header": "Activity", "width": 70 },
                                                 { "id": "image", "header": "Image", "editor": "text", "template": "<div><img src='#image#' class='openImage' style='max-width: 150px; max-width: 120px;' /></div>", "width": 150 },
                                                 { "id": "caption", "header": "Caption", "editor": "text", "fillspace": true },
-                                                { "id": "status", "header": "Status", "editor": "text", "width": 110 },
                                                 { "id": "date", "header": "Date", "width": 100 },
                                                 { "id": "uploadedBy", "header": "Uploaded by", "template": "#displayName#", "width": 140 },
 
@@ -256,12 +257,11 @@ steal(
 												//                                }}
 											},
 											elements: [
-												{ "view": "text", "label": "caption", "name": "caption", "type": "text" },
-												{ "view": "text", "label": "image", "name": "image", "type": "text" },
-												{ "view": "datepicker", "label": "date", "name": "date", "timepicker": false },
-												{ "view": "textarea", "id": "txt-uploadedBy", "label": "uploadedBy", "name": "uploadedBy" },
-												{ "view": "text", "label": "activity", "name": "activity" },
-												{ "view": "text", "label": "status", "name": "status", "type": "text" }
+												{ "view": "text", "label": "Activity", "name": "activity" },
+												{ "view": "text", "label": "Image", "name": "image", "type": "text" },
+												{ "view": "text", "label": "Caption", "name": "caption", "type": "text" },
+												{ "view": "datepicker", "label": "Date", "name": "date", "timepicker": false },
+												{ "view": "text", "label": "Uploaded by", "name": "displayName", "id": _this.idUploadedBy }
 												// {
 												//     view:   "text",
 												//     label:  "Role Label",
@@ -286,9 +286,6 @@ steal(
 											id: _this.idFormButtons,
 											"type": "line",
 											"rows": [
-												{
-													"view": "spacer"
-												},
 												{
 													"type": "line",
 													"cols": [
@@ -373,9 +370,6 @@ steal(
 															"view": "spacer"
 														}
 													]
-												},
-												{
-													"view": "spacer"
 												}
 											]
 										}
@@ -460,12 +454,11 @@ steal(
 							var form = $$(this.idForm);
 							form.clearValidation();
 
-							// var uploadedByData = JSON.stringify($$("txt-uploadedBy").value);
-							// $$("txt-uploadedBy").setValue(uploadedByData);
-
 							form.show();
 
 							$$(this.idFormButtons).show();
+
+							$$(this.idUploadedBy).disable();
 
 							$$(this.idTable).hide();
 							$$(this.idPagerA).hide();

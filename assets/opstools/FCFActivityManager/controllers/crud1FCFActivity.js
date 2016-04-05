@@ -39,6 +39,11 @@ steal(
                             this.idForm = ControllerName + "Form";
                             this.idFormButtons = this.idForm + "Buttons";
 
+							this.idApprovedBy = ControllerName + "ApprovedBy";
+							this.idCreatedBy = ControllerName + "CreatedBy";
+							this.idCreatedAt = ControllerName + "CreatedAt";
+							this.idUpdatedAt = ControllerName + "UpdatedAt";
+
                             webix.ready(function() {
 
                                 var lblList = AD.lang.label.getLabel('webix.common.list') || 'List*';
@@ -143,7 +148,8 @@ steal(
                                                 { "id": "team", "header": "Team", "width": 140, "template": function(r) { 
 													return r.MinistryDisplayName ? r.MinistryDisplayName : '';
 												} },
-                                                { "id": "createdBy", "header": "Created by", "width": 200, "template": function(r) { 
+                                                { "id": "createdBy", "header": "Created by", "width": 200, "template": function(r) {
+console.log('createdBy: ', r.createdBy); 
 													return (r.createdBy.NameFirstEng ? r.createdBy.NameFirstEng + ' ' : '') +
 															(r.createdBy.NameMiddleEng ? r.createdBy.NameMiddleEng + ' ' : '') +
 															(r.createdBy.NameLastEng ? r.createdBy.NameLastEng + ' ' : '');
@@ -266,16 +272,15 @@ steal(
 												//                                }}
                                             },
                                             elements: [
-                                                { "view": "datepicker", "label": "date_start", "name": "date_start", "timepicker": false },
-                                                { "view": "datepicker", "label": "date_end", "name": "date_end", "timepicker": false },
-                                                { "view": "text", "label": "default_image", "name": "default_image", "type": "text" },
-                                                { "view": "text", "label": "team", "name": "team" },
-                                                { "view": "text", "label": "createdBy", "name": "createdBy" },
-                                                { "view": "text", "label": "approvedBy", "name": "approvedBy" },
-                                                { "view": "text", "label": "status", "name": "status", "type": "text" },
-                                                { "view": "text", "label": "id", "name": "id" },
-                                                { "view": "datepicker", "label": "createdAt", "name": "createdAt", "timepicker": true },
-                                                { "view": "datepicker", "label": "updatedAt", "name": "updatedAt", "timepicker": true }
+                                                { "view": "text", "label": "Default image", "name": "default_image", "type": "text" },
+                                                { "view": "text", "label": "Status", "name": "status", "type": "text" },
+                                                { "view": "text", "label": "Team", "name": "team" },
+                                                { "view": "datepicker", "label": "Start date", "name": "date_start", "timepicker": false },
+                                                { "view": "datepicker", "label": "End date", "name": "date_end", "timepicker": false },
+                                                { "view": "text", "label": "Approved by", "name": "approvedBy", "id": _this.idApprovedBy },
+                                                { "view": "text", "label": "Created by", "name": "createdBy", "id": _this.idCreatedBy },
+                                                { "view": "datepicker", "label": "Created at", "name": "createdAt", "timepicker": true, "id": _this.idCreatedAt },
+                                                { "view": "datepicker", "label": "Updated at", "name": "updatedAt", "timepicker": true, "id": _this.idUpdatedAt }
                                                 // {
                                                 //     view:   "text",
                                                 //     label:  "Role Label",
@@ -300,9 +305,6 @@ steal(
                                             id: _this.idFormButtons,
                                             "type": "line",
                                             "rows": [
-                                                {
-                                                    "view": "spacer"
-                                                },
                                                 {
                                                     "type": "line",
                                                     "cols": [
@@ -387,9 +389,6 @@ steal(
                                                             "view": "spacer",
                                                         }
                                                     ]
-                                                },
-                                                {
-                                                    "view": "spacer",
                                                 }
                                             ]
                                         }
@@ -491,6 +490,11 @@ steal(
                             form.show();
 
                             $$(this.idFormButtons).show();
+
+							$$(this.idApprovedBy).disable();
+							$$(this.idCreatedBy).disable();
+							$$(this.idCreatedAt).disable();
+							$$(this.idUpdatedAt).disable();
 
                             $$(this.idTable).hide();
                             $$(this.idPagerA).hide();
