@@ -39,6 +39,8 @@ steal(
                             this.idForm = ControllerName + "Form";
                             this.idFormButtons = this.idForm + "Buttons";
 
+							this.idName = ControllerName + "idName";
+							this.idDescription = ControllerName + "idDescription";
 							this.idTeam = ControllerName + "idTeam";
 							this.idApprovedBy = ControllerName + "ApprovedBy";
 							this.idCreatedBy = ControllerName + "CreatedBy";
@@ -144,7 +146,27 @@ steal(
                                             columns: [
                                                 { "id": "id", "header": "id", "width": 40 },
                                                 { "id": "default_image", "header": "Default Image", "editor": "text", "template": "<img src='/data/fcf/images/activities/#default_image#' class='openImage' style='max-width: 150px; max-width: 120px;' />", "width": 150 },
-                                                { "id": "status", "header": "Status", "width": 90, "editor": "text", fillspace: true },
+												{ "id": "name", "header": "Name", "width": 200, "editor": "text", "template": function(r) {
+													var trans = $.grep(r.translations, function(t, index) {
+														return t.language_code === AD.lang.currentLanguage;
+													});
+													
+													if (trans.length > 0)
+														return trans[0].activity_name;
+													else 
+														return '';
+												}},
+												{ "id": "name", "header": "Description", "width": 180, "css": "test", "template": function(r) {
+													var trans = $.grep(r.translations, function(t, index) {
+														return t.language_code === AD.lang.currentLanguage;
+													});
+													
+													if (trans.length > 0)
+														return trans[0].activity_description;
+													else 
+														return '';
+												}},
+                                                { "id": "status", "header": "Status", "width": 90, "editor": "text" },
                                                 { "id": "approvedBy", "header": "Approved by" },
                                                 { "id": "team", "header": "Team", "width": 140, "template": function(r) { 
 													return ((r.team && r.team.NameMinistryEng) ? r.team.NameMinistryEng : '');
@@ -156,8 +178,8 @@ steal(
 												} },
                                                 { "id": "date_start", "header": "Start date", "format": webix.Date.dateToStr("%Y-%m-%d"), "width": 100 },
                                                 { "id": "date_end", "header": "End date", "format": webix.Date.dateToStr("%Y-%m-%d"), "width": 100 },
-                                                { "id": "createdAt", "header": "Created at", "format": webix.Date.dateToStr("%Y-%m-%d %h:%i"), "width": 160 },
-                                                { "id": "updatedAt", "header": "Updated at", "format": webix.Date.dateToStr("%Y-%m-%d %h:%i"), "width": 160 },
+                                                // { "id": "createdAt", "header": "Created at", "format": webix.Date.dateToStr("%Y-%m-%d %h:%i"), "width": 150 },
+                                                // { "id": "updatedAt", "header": "Updated at", "format": webix.Date.dateToStr("%Y-%m-%d %h:%i"), "width": 150, fillspace: true },
 
                                                 // { id:"copy",  header:"" , width:40, css:{"text-align":"center"}, template:function(obj) { return "<div class='clone fa fa-copy fa-2 offset-9 rbac-role-list-clone' role-id='"+obj.id+"'  ></div>"; } } ,
                                                 { id: "trash", header: "", width: 40, css: { "text-align": "center" }, template: "<span class='trash'>{common.trashIcon()}</span>" }
@@ -273,12 +295,14 @@ steal(
                                             },
                                             elements: [
                                                 { "view": "text", "label": "Default image", "name": "default_image", "type": "text" },
+                                                { "view": "text", "label": "Name", "name": "name", "type": "text", "required" : false, "id": _this.idName },
+                                                { "view": "text", "label": "Description", "name": "description", "type": "text", "required" : false, "id": _this.idDescription },
                                                 { "view": "text", "label": "Status", "name": "status", "type": "text" },
                                                 { "view": "datepicker", "label": "Start date", "name": "date_start", "timepicker": false },
                                                 { "view": "datepicker", "label": "End date", "name": "date_end", "timepicker": false },
                                                 { "view": "text", "label": "Team", "name": "team.NameMinistryEng", "required" : false, "id": _this.idTeam },
                                                 { "view": "text", "label": "Approved by", "name": "approvedBy", "required" : false, "id": _this.idApprovedBy },
-                                                { "view": "text", "label": "Created by", "name": "createdBy.NameFirstEng", "required" : false,"id": _this.idCreatedBy },
+                                                { "view": "text", "label": "Created by", "name": "createdBy.NameFirstEng", "required" : false, "id": _this.idCreatedBy },
                                                 { "view": "datepicker", "label": "Created at", "name": "createdAt", "timepicker": true, "id": _this.idCreatedAt },
                                                 { "view": "datepicker", "label": "Updated at", "name": "updatedAt", "timepicker": true, "id": _this.idUpdatedAt }
                                                 // {
@@ -492,7 +516,16 @@ steal(
                             $$(this.idFormButtons).show();
 
 							var selectedItem = $$(this.idTable).getItem($$(this.idTable).getSelectedId());
-							
+
+							var trans = $.grep(selectedItem.translations, function(t, index) {
+								return t.language_code === AD.lang.currentLanguage;
+							});
+
+							if (trans.length > 0) {
+								$$(this.idName).setValue(trans[0].activity_name);
+								$$(this.idDescription).setValue(trans[0].activity_description);
+							}
+
 							$$(this.idTeam).setValue(selectedItem.team && selectedItem.team.NameMinistryEng ? selectedItem.team.NameMinistryEng : '');
 
 							var createdBy = (selectedItem.createdBy.NameFirstEng ? selectedItem.createdBy.NameFirstEng + ' ' : '') +
