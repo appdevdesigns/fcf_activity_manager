@@ -39,6 +39,7 @@ steal(
                             this.idForm = ControllerName + "Form";
                             this.idFormButtons = this.idForm + "Buttons";
 
+							this.idTeam = ControllerName + "idTeam";
 							this.idApprovedBy = ControllerName + "ApprovedBy";
 							this.idCreatedBy = ControllerName + "CreatedBy";
 							this.idCreatedAt = ControllerName + "CreatedAt";
@@ -146,10 +147,9 @@ steal(
                                                 { "id": "status", "header": "Status", "width": 90, "editor": "text", fillspace: true },
                                                 { "id": "approvedBy", "header": "Approved by" },
                                                 { "id": "team", "header": "Team", "width": 140, "template": function(r) { 
-													return r.MinistryDisplayName ? r.MinistryDisplayName : '';
+													return ((r.team && r.team.NameMinistryEng) ? r.team.NameMinistryEng : '');
 												} },
                                                 { "id": "createdBy", "header": "Created by", "width": 200, "template": function(r) {
-console.log('createdBy: ', r.createdBy); 
 													return (r.createdBy.NameFirstEng ? r.createdBy.NameFirstEng + ' ' : '') +
 															(r.createdBy.NameMiddleEng ? r.createdBy.NameMiddleEng + ' ' : '') +
 															(r.createdBy.NameLastEng ? r.createdBy.NameLastEng + ' ' : '');
@@ -274,11 +274,11 @@ console.log('createdBy: ', r.createdBy);
                                             elements: [
                                                 { "view": "text", "label": "Default image", "name": "default_image", "type": "text" },
                                                 { "view": "text", "label": "Status", "name": "status", "type": "text" },
-                                                { "view": "text", "label": "Team", "name": "team" },
                                                 { "view": "datepicker", "label": "Start date", "name": "date_start", "timepicker": false },
                                                 { "view": "datepicker", "label": "End date", "name": "date_end", "timepicker": false },
-                                                { "view": "text", "label": "Approved by", "name": "approvedBy", "id": _this.idApprovedBy },
-                                                { "view": "text", "label": "Created by", "name": "createdBy", "id": _this.idCreatedBy },
+                                                { "view": "text", "label": "Team", "name": "team.NameMinistryEng", "required" : false, "id": _this.idTeam },
+                                                { "view": "text", "label": "Approved by", "name": "approvedBy", "required" : false, "id": _this.idApprovedBy },
+                                                { "view": "text", "label": "Created by", "name": "createdBy.NameFirstEng", "required" : false,"id": _this.idCreatedBy },
                                                 { "view": "datepicker", "label": "Created at", "name": "createdAt", "timepicker": true, "id": _this.idCreatedAt },
                                                 { "view": "datepicker", "label": "Updated at", "name": "updatedAt", "timepicker": true, "id": _this.idUpdatedAt }
                                                 // {
@@ -491,6 +491,18 @@ console.log('createdBy: ', r.createdBy);
 
                             $$(this.idFormButtons).show();
 
+							var selectedItem = $$(this.idTable).getItem($$(this.idTable).getSelectedId());
+							
+							$$(this.idTeam).setValue(selectedItem.team && selectedItem.team.NameMinistryEng ? team.NameMinistryEng : '');
+
+							var createdBy = (selectedItem.createdBy.NameFirstEng ? selectedItem.createdBy.NameFirstEng + ' ' : '') +
+											(selectedItem.createdBy.NameMiddleEng ? selectedItem.createdBy.NameMiddleEng + ' ' : '') +
+											(selectedItem.createdBy.NameLastEng ? selectedItem.createdBy.NameLastEng + ' ' : '');							
+							$$(this.idCreatedBy).setValue(createdBy);
+
+							// $$(this.idApprovedBy).setValue('Approved');
+
+							$$(this.idTeam).disable();
 							$$(this.idApprovedBy).disable();
 							$$(this.idCreatedBy).disable();
 							$$(this.idCreatedAt).disable();
