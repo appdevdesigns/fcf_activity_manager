@@ -493,7 +493,7 @@ steal(
 
 							var selectedItem = $$(this.idTable).getItem($$(this.idTable).getSelectedId());
 							
-							$$(this.idTeam).setValue(selectedItem.team && selectedItem.team.NameMinistryEng ? team.NameMinistryEng : '');
+							$$(this.idTeam).setValue(selectedItem.team && selectedItem.team.NameMinistryEng ? selectedItem.team.NameMinistryEng : '');
 
 							var createdBy = (selectedItem.createdBy.NameFirstEng ? selectedItem.createdBy.NameFirstEng + ' ' : '') +
 											(selectedItem.createdBy.NameMiddleEng ? selectedItem.createdBy.NameMiddleEng + ' ' : '') +
