@@ -156,7 +156,7 @@ steal(
 													else 
 														return '';
 												}},
-												{ "id": "name", "header": "Description", "width": 180, "css": "test", "template": function(r) {
+												{ "id": "name", "header": "Description", "width": 180, "css": "test", "fillspace": true, "template": function(r) {
 													var trans = $.grep(r.translations, function(t, index) {
 														return t.language_code === AD.lang.currentLanguage;
 													});
@@ -166,8 +166,10 @@ steal(
 													else 
 														return '';
 												}},
-                                                { "id": "status", "header": "Status", "width": 90, "editor": "text" },
-                                                { "id": "approvedBy", "header": "Approved by" },
+                                                { "id": "status", "header": "Status", "width": 90, "template": function(r) {
+														return r.status + (r.status === 'approved' && r.approvedBy ? '<br /> By' + r.approvedBy : '');
+													}
+												},
                                                 { "id": "team", "header": "Team", "width": 140, "template": function(r) { 
 													return ((r.team && r.team.NameMinistryEng) ? r.team.NameMinistryEng : '');
 												} },
@@ -296,7 +298,7 @@ steal(
                                             elements: [
                                                 { "view": "text", "label": "Default image", "name": "default_image", "type": "text" },
                                                 { "view": "text", "label": "Name", "name": "name", "type": "text", "required" : false, "id": _this.idName },
-                                                { "view": "text", "label": "Description", "name": "description", "type": "text", "required" : false, "id": _this.idDescription },
+                                                { "view": "textarea", "label": "Description", "name": "description", "height": 130, "type": "text", "required" : false, "id": _this.idDescription },
                                                 { "view": "text", "label": "Status", "name": "status", "type": "text" },
                                                 { "view": "datepicker", "label": "Start date", "name": "date_start", "timepicker": false },
                                                 { "view": "datepicker", "label": "End date", "name": "date_end", "timepicker": false },
