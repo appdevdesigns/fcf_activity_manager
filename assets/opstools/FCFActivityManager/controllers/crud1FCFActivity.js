@@ -41,6 +41,8 @@ steal(
 
 							this.idName = ControllerName + "idName";
 							this.idDescription = ControllerName + "idDescription";
+							this.idNameGovt = ControllerName + "idNameGovt";
+							this.idDescriptionGovt = ControllerName + "idDescriptionGovt";
 							this.idTeam = ControllerName + "idTeam";
 							this.idApprovedBy = ControllerName + "ApprovedBy";
 							this.idCreatedBy = ControllerName + "CreatedBy";
@@ -150,9 +152,13 @@ steal(
 													var trans = $.grep(r.translations, function(t, index) {
 														return t.language_code === AD.lang.currentLanguage;
 													});
-													
-													if (trans.length > 0)
-														return trans[0].activity_name;
+
+													if (trans.length > 0) {
+														var nameHtml = '<div style="height: 30px; line-height: 30px;">' + trans[0].activity_name + '</div>' + 
+																		(trans[0].activity_name_govt ? '<div style="height: 30px; line-height: 30px;"><b>Govt: </b>' + trans[0].activity_name_govt + '</div>' : '');
+
+														return nameHtml;
+													}
 													else 
 														return '';
 												}},
@@ -161,8 +167,12 @@ steal(
 														return t.language_code === AD.lang.currentLanguage;
 													});
 													
-													if (trans.length > 0)
-														return trans[0].activity_description;
+													if (trans.length > 0) {
+														var descriptionHtml = '<div style="height: 30px; line-height: 30px;">' + trans[0].activity_description + '</div>' + 
+																		(trans[0].activity_description_govt ? '<div style="height: 30px; line-height: 30px;"><b>Govt: </b>' + trans[0].activity_description_govt + '</div>' : '');
+
+														return descriptionHtml;
+													}
 													else 
 														return '';
 												}},
@@ -298,7 +308,9 @@ steal(
                                             elements: [
                                                 { "view": "text", "label": "Default image", "name": "default_image", "type": "text" },
                                                 { "view": "text", "label": "Name", "name": "name", "type": "text", "required" : false, "id": _this.idName },
+                                                { "view": "text", "label": "Name (Govt)", "name": "name_govt", "type": "text", "required" : false, "id": _this.idNameGovt },
                                                 { "view": "textarea", "label": "Description", "name": "description", "height": 130, "type": "text", "required" : false, "id": _this.idDescription },
+                                                { "view": "textarea", "label": "Description (Govt)", "name_govt": "description", "height": 130, "type": "text", "required" : false, "id": _this.idDescriptionGovt },
                                                 { "view": "text", "label": "Status", "name": "status", "type": "text" },
                                                 { "view": "datepicker", "label": "Start date", "name": "date_start", "timepicker": false },
                                                 { "view": "datepicker", "label": "End date", "name": "date_end", "timepicker": false },
@@ -526,6 +538,9 @@ steal(
 							if (trans.length > 0) {
 								$$(this.idName).setValue(trans[0].activity_name);
 								$$(this.idDescription).setValue(trans[0].activity_description);
+
+								$$(this.idNameGovt).setValue(trans[0].activity_name_govt);
+								$$(this.idDescriptionGovt).setValue(trans[0].activity_description_govt);
 							}
 
 							$$(this.idTeam).setValue(selectedItem.team && selectedItem.team.NameMinistryEng ? selectedItem.team.NameMinistryEng : '');

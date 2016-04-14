@@ -141,6 +141,7 @@ steal(
                                                 { "id": "activity", "header": "Activity", "width": 70 },
                                                 { "id": "image", "header": "Image", "editor": "text", "template": "<div><img src='#image#' class='openImage' style='max-width: 150px; max-width: 120px;' /></div>", "width": 150 },
                                                 { "id": "caption", "header": "Caption", "editor": "text", "fillspace": true },
+                                                { "id": "caption_govt", "header": "Caption (Govt)", "editor": "text", "fillspace": true },
                                                 { "id": "date", "header": "Date", "width": 100 },
                                                 { "id": "uploadedBy", "header": "Uploaded by", "template": "#displayName#", "width": 140 },
 
@@ -260,6 +261,7 @@ steal(
 												{ "view": "text", "label": "Activity", "name": "activity" },
 												{ "view": "text", "label": "Image", "name": "image", "type": "text" },
 												{ "view": "text", "label": "Caption", "name": "caption", "type": "text" },
+												{ "view": "text", "label": "Caption (Govt)", "name": "caption_govt", "type": "text" },
 												{ "view": "datepicker", "label": "Date", "name": "date", "timepicker": false },
 												{ "view": "text", "label": "Uploaded by", "name": "displayName", "id": _this.idUploadedBy }
 												// {
