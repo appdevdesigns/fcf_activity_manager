@@ -1,19 +1,19 @@
 steal(
     // List your Controller's dependencies here:
     'opstools/FCFActivityManager/models/FCFActivity.js',
-    function() {
-        System.import('appdev').then(function() {
+    function () {
+        System.import('appdev').then(function () {
             steal.import('appdev/ad',
-                'appdev/control/control').then(function() {
+                'appdev/control/control').then(function () {
 
 
-					// Namespacing conventions:
-					// AD.Control.extend('[application].[controller]', [{ static },] {instance} );
-					AD.Control.extend('opstools.FCFActivityManager.crud1FCFActivity', {
+                    // Namespacing conventions:
+                    // AD.Control.extend('[application].[controller]', [{ static },] {instance} );
+                    AD.Control.extend('opstools.FCFActivityManager.crud1FCFActivity', {
 
 
 
-						init: function(element, options) {
+                        init: function (element, options) {
 
                             this.options = options;
 
@@ -27,7 +27,7 @@ steal(
                         },
 
 
-                        initDOM: function() {
+                        initDOM: function () {
                             var _this = this;
 
                             var ControllerName = "crud1FCFActivity";
@@ -39,17 +39,65 @@ steal(
                             this.idForm = ControllerName + "Form";
                             this.idFormButtons = this.idForm + "Buttons";
 
-							this.idName = ControllerName + "idName";
-							this.idDescription = ControllerName + "idDescription";
-							this.idNameGovt = ControllerName + "idNameGovt";
-							this.idDescriptionGovt = ControllerName + "idDescriptionGovt";
-							this.idTeam = ControllerName + "idTeam";
-							this.idApprovedBy = ControllerName + "ApprovedBy";
-							this.idCreatedBy = ControllerName + "CreatedBy";
-							this.idCreatedAt = ControllerName + "CreatedAt";
-							this.idUpdatedAt = ControllerName + "UpdatedAt";
+                            this.idName = ControllerName + "idName";
+                            this.idDescription = ControllerName + "idDescription";
+                            this.idNameGovt = ControllerName + "idNameGovt";
+                            this.idDescriptionGovt = ControllerName + "idDescriptionGovt";
+                            this.idTeam = ControllerName + "idTeam";
+                            this.idApprovedBy = ControllerName + "ApprovedBy";
+                            this.idCreatedBy = ControllerName + "CreatedBy";
+                            this.idCreatedAt = ControllerName + "CreatedAt";
+                            this.idUpdatedAt = ControllerName + "UpdatedAt";
 
-                            webix.ready(function() {
+                            webix.protoUI({
+                                name: "filter_popup",
+                                $init: function (config) {
+                                    //functions executed on component initialization
+                                    this.conditionList = ['contains',
+                                        'does not contain',
+                                        'is',
+                                        'is not',
+                                        'is empty',
+                                        'is not empty'];
+                                },
+                                defaults: {
+                                    width: 800,
+                                    body: {
+                                        view: "form",
+                                        autoheight: true,
+                                        elements: [{
+                                            view: "button", value: "Add a filter", click: function () {
+                                                this.getTopParentView().addNewFilter();
+                                            }
+                                        }]
+                                    }
+                                },
+                                addNewFilter: function () {
+                                    this.getBody().addView({
+                                        cols: [
+                                            { view: "combo", value: "And", options: ["And", "Or"], width: 80 },
+                                            { view: "combo", options: this.fieldList, value: this.fieldList[0] },
+                                            { view: "combo", options: this.conditionList, value: this.conditionList[0], width: 155 },
+                                            { view: "text" },
+                                            {
+                                                view: "button", value: "X", width: 30, click: function () {
+                                                    this.getFormView().removeView(this.getParentView());
+                                                }
+                                            }
+                                        ]
+                                    }, 0);
+                                },
+                                setFields: function (fieldList) {
+                                    this.fieldList = fieldList;
+                                }
+                            }, webix.ui.popup);
+
+                            webix.ui({
+                                view: "filter_popup",
+                                id: "filter_popup"
+                            }).hide();
+
+                            webix.ready(function () {
 
                                 var lblList = AD.lang.label.getLabel('webix.common.list') || 'List*';
                                 var lblNew = AD.lang.label.getLabel('webix.common.new') || 'New*';
@@ -73,21 +121,21 @@ steal(
                                             width: 80,
                                             label: lblList,
                                             batch: 'form',
-                                            click: function() {
+                                            click: function () {
 
                                                 var lblConfirm = AD.lang.label.getLabel('webix.common.confirmSwitchToList') || '*Switch to List without saving any changes?';
 
                                                 webix.confirm({
 
-													text: lblConfirm,
+                                                    text: lblConfirm,
 
-													callback: function(result) {
+                                                    callback: function (result) {
 
-														if (result) {
+                                                        if (result) {
 
-															_this.toList();
-														}
-													}
+                                                            _this.toList();
+                                                        }
+                                                    }
                                                 });
 
                                                 return false;
@@ -100,7 +148,7 @@ steal(
                                             type: "icon",
                                             label: lblNew,
                                             batch: 'list',
-                                            click: function() {
+                                            click: function () {
 
                                                 $$(_this.idTable).clearSelection();     // visual 
                                                 _this.dataCollection.setCursor(null);   // no data selected
@@ -116,7 +164,8 @@ steal(
                                             icon: "filter",
                                             type: "icon",
                                             label: lblFilter,
-                                            batch: 'list'
+                                            batch: 'list',
+                                            popup: 'filter_popup'
                                         },
                                         {
                                             view: "search",
@@ -135,7 +184,6 @@ steal(
                                     ]
                                 };
 
-
                                 _this.webixLayout = webix.ui({
                                     container: ControllerName,
                                     "rows": [
@@ -144,50 +192,59 @@ steal(
                                             view: "datatable",
                                             id: _this.idTable,
                                             pager: _this.idPagerA,
-											rowHeight: 100,
+                                            rowHeight: 100,
                                             columns: [
                                                 { "id": "id", "header": "id", "width": 40 },
                                                 { "id": "default_image", "header": "Default Image", "editor": "text", "template": "<img src='/data/fcf/images/activities/#default_image#' class='openImage' style='max-width: 150px; max-width: 120px;' />", "width": 150 },
-												{ "id": "name", "header": "Name", "width": 200, "editor": "text", "template": function(r) {
-													var trans = $.grep(r.translations, function(t, index) {
-														return t.language_code === AD.lang.currentLanguage;
-													});
+                                                {
+                                                    "id": "name", "header": "Name", "width": 200, "editor": "text", "template": function (r) {
+                                                        var trans = $.grep(r.translations, function (t, index) {
+                                                            return t.language_code === AD.lang.currentLanguage;
+                                                        });
 
-													if (trans.length > 0) {
-														var nameHtml = '<div style="height: 30px; line-height: 30px;">' + trans[0].activity_name + '</div>' + 
-																		(trans[0].activity_name_govt ? '<div style="height: 30px; line-height: 30px;"><b>Govt: </b>' + trans[0].activity_name_govt + '</div>' : '');
+                                                        if (trans.length > 0) {
+                                                            var nameHtml = '<div style="height: 30px; line-height: 30px;">' + trans[0].activity_name + '</div>' +
+                                                                (trans[0].activity_name_govt ? '<div style="height: 30px; line-height: 30px;"><b>Govt: </b>' + trans[0].activity_name_govt + '</div>' : '');
 
-														return nameHtml;
-													}
-													else 
-														return '';
-												}},
-												{ "id": "name", "header": "Description", "width": 180, "css": "test", "fillspace": true, "template": function(r) {
-													var trans = $.grep(r.translations, function(t, index) {
-														return t.language_code === AD.lang.currentLanguage;
-													});
-													
-													if (trans.length > 0) {
-														var descriptionHtml = '<div style="height: 30px; line-height: 30px;">' + trans[0].activity_description + '</div>' + 
-																		(trans[0].activity_description_govt ? '<div style="height: 30px; line-height: 30px;"><b>Govt: </b>' + trans[0].activity_description_govt + '</div>' : '');
+                                                            return nameHtml;
+                                                        }
+                                                        else
+                                                            return '';
+                                                    }
+                                                },
+                                                {
+                                                    "id": "name", "header": "Description", "width": 180, "css": "test", "fillspace": true, "template": function (r) {
+                                                        var trans = $.grep(r.translations, function (t, index) {
+                                                            return t.language_code === AD.lang.currentLanguage;
+                                                        });
 
-														return descriptionHtml;
-													}
-													else 
-														return '';
-												}},
-                                                { "id": "status", "header": "Status", "width": 90, "template": function(r) {
-														return r.status + (r.status === 'approved' && r.approvedBy ? '<br /> By' + r.approvedBy : '');
-													}
-												},
-                                                { "id": "team", "header": "Team", "width": 140, "template": function(r) { 
-													return ((r.team && r.team.NameMinistryEng) ? r.team.NameMinistryEng : '');
-												} },
-                                                { "id": "createdBy", "header": "Created by", "width": 200, "template": function(r) {
-													return (r.createdBy.NameFirstEng ? r.createdBy.NameFirstEng + ' ' : '') +
-															(r.createdBy.NameMiddleEng ? r.createdBy.NameMiddleEng + ' ' : '') +
-															(r.createdBy.NameLastEng ? r.createdBy.NameLastEng + ' ' : '');
-												} },
+                                                        if (trans.length > 0) {
+                                                            var descriptionHtml = '<div style="height: 30px; line-height: 30px;">' + trans[0].activity_description + '</div>' +
+                                                                (trans[0].activity_description_govt ? '<div style="height: 30px; line-height: 30px;"><b>Govt: </b>' + trans[0].activity_description_govt + '</div>' : '');
+
+                                                            return descriptionHtml;
+                                                        }
+                                                        else
+                                                            return '';
+                                                    }
+                                                },
+                                                {
+                                                    "id": "status", "header": "Status", "width": 90, "template": function (r) {
+                                                        return r.status + (r.status === 'approved' && r.approvedBy ? '<br /> By' + r.approvedBy : '');
+                                                    }
+                                                },
+                                                {
+                                                    "id": "team", "header": "Team", "width": 140, "template": function (r) {
+                                                        return ((r.team && r.team.NameMinistryEng) ? r.team.NameMinistryEng : '');
+                                                    }
+                                                },
+                                                {
+                                                    "id": "createdBy", "header": "Created by", "width": 200, "template": function (r) {
+                                                        return (r.createdBy.NameFirstEng ? r.createdBy.NameFirstEng + ' ' : '') +
+                                                            (r.createdBy.NameMiddleEng ? r.createdBy.NameMiddleEng + ' ' : '') +
+                                                            (r.createdBy.NameLastEng ? r.createdBy.NameLastEng + ' ' : '');
+                                                    }
+                                                },
                                                 { "id": "date_start", "header": "Start date", "format": webix.Date.dateToStr("%Y-%m-%d"), "width": 100 },
                                                 { "id": "date_end", "header": "End date", "format": webix.Date.dateToStr("%Y-%m-%d"), "width": 100 },
                                                 // { "id": "createdAt", "header": "Created at", "format": webix.Date.dateToStr("%Y-%m-%d %h:%i"), "width": 150 },
@@ -223,7 +280,7 @@ steal(
                                                 // },
 
 
-                                                onItemClick: function(id) {
+                                                onItemClick: function (id) {
 
                                                     _this.dataCollection.setCursor(id);
                                                     _this.toForm();
@@ -232,53 +289,53 @@ steal(
                                             },
 
                                             onClick: {
-												openImage: function(e, id, trg) {
-													var imageUrl = '/data/fcf/images/activities/' + $$(_this.idTable).getItem(id)[id.column];
+                                                openImage: function (e, id, trg) {
+                                                    var imageUrl = '/data/fcf/images/activities/' + $$(_this.idTable).getItem(id)[id.column];
 
-													webix.ui({
-														id: "image_popup",
-														view: "window",
-														position: "center",
-														head: {
-															view: "toolbar", cols: [
-																{ view: "label", label: id.column + ' image' },
-																{ view: "button", label: "X", width: 70, click: ("$$('image_popup').close();") }
-															]
-														},
-														body: {
-															template: '<img src="' + imageUrl + '" width="680" />'
-														},
-														modal: true,
-														resize: true,
-														height: 500,
-														width: 700,
-													}).show();
+                                                    webix.ui({
+                                                        id: "image_popup",
+                                                        view: "window",
+                                                        position: "center",
+                                                        head: {
+                                                            view: "toolbar", cols: [
+                                                                { view: "label", label: id.column + ' image' },
+                                                                { view: "button", label: "X", width: 70, click: ("$$('image_popup').close();") }
+                                                            ]
+                                                        },
+                                                        body: {
+                                                            template: '<img src="' + imageUrl + '" width="680" />'
+                                                        },
+                                                        modal: true,
+                                                        resize: true,
+                                                        height: 500,
+                                                        width: 700,
+                                                    }).show();
 
-													return false;
-												},
-											    trash: function(e, id) {
+                                                    return false;
+                                                },
+                                                trash: function (e, id) {
 
                                                     var model = _this.dataCollection.AD.getModel(id);
                                                     var lblConfirm = AD.lang.label.getLabel('webix.common.confirmDelete', [model.getLabel()]) || '*Remove : ' + model.getLabel();
                                                     webix.confirm({
 
-														text: lblConfirm,
+                                                        text: lblConfirm,
 
-														callback: function(result) {
+                                                        callback: function (result) {
 
-															if (result) {
+                                                            if (result) {
 
-																_this.dataCollection.AD.destroyModel(id)
-                                                                    .fail(function(err) {
+                                                                _this.dataCollection.AD.destroyModel(id)
+                                                                    .fail(function (err) {
                                                                         AD.error.log('Error destroying entry.', { error: err, role: role, id: id, other: 'crud1PermissionRole' });
                                                                     })
-                                                                    .then(function(oldData) {
+                                                                    .then(function (oldData) {
 
                                                                         // _this.dom.roleForm.hide();
 
                                                                     });
-															}
-														}
+                                                            }
+                                                        }
                                                     });
 
                                                     return false;
@@ -301,22 +358,22 @@ steal(
                                             type: "line",
                                             elementsConfig: {
                                                 labelPosition: "top",
-												//                                on:{ onchange:function(newv, oldv){  
-												//                                        webix.message("Value changed from: "+oldv+" to: "+newv);
-												//                                }}
+                                                //                                on:{ onchange:function(newv, oldv){  
+                                                //                                        webix.message("Value changed from: "+oldv+" to: "+newv);
+                                                //                                }}
                                             },
                                             elements: [
                                                 { "view": "text", "label": "Default image", "name": "default_image", "type": "text" },
-                                                { "view": "text", "label": "Name", "name": "name", "type": "text", "required" : false, "id": _this.idName },
-                                                { "view": "text", "label": "Name (Govt)", "name": "name_govt", "type": "text", "required" : false, "id": _this.idNameGovt },
-                                                { "view": "textarea", "label": "Description", "name": "description", "height": 130, "type": "text", "required" : false, "id": _this.idDescription },
-                                                { "view": "textarea", "label": "Description (Govt)", "name_govt": "description", "height": 130, "type": "text", "required" : false, "id": _this.idDescriptionGovt },
+                                                { "view": "text", "label": "Name", "name": "name", "type": "text", "required": false, "id": _this.idName },
+                                                { "view": "text", "label": "Name (Govt)", "name": "name_govt", "type": "text", "required": false, "id": _this.idNameGovt },
+                                                { "view": "textarea", "label": "Description", "name": "description", "height": 130, "type": "text", "required": false, "id": _this.idDescription },
+                                                { "view": "textarea", "label": "Description (Govt)", "name_govt": "description", "height": 130, "type": "text", "required": false, "id": _this.idDescriptionGovt },
                                                 { "view": "text", "label": "Status", "name": "status", "type": "text" },
                                                 { "view": "datepicker", "label": "Start date", "name": "date_start", "timepicker": false },
                                                 { "view": "datepicker", "label": "End date", "name": "date_end", "timepicker": false },
-                                                { "view": "text", "label": "Team", "name": "team.NameMinistryEng", "required" : false, "id": _this.idTeam },
-                                                { "view": "text", "label": "Approved by", "name": "approvedBy", "required" : false, "id": _this.idApprovedBy },
-                                                { "view": "text", "label": "Created by", "name": "createdBy.NameFirstEng", "required" : false, "id": _this.idCreatedBy },
+                                                { "view": "text", "label": "Team", "name": "team.NameMinistryEng", "required": false, "id": _this.idTeam },
+                                                { "view": "text", "label": "Approved by", "name": "approvedBy", "required": false, "id": _this.idApprovedBy },
+                                                { "view": "text", "label": "Created by", "name": "createdBy.NameFirstEng", "required": false, "id": _this.idCreatedBy },
                                                 { "view": "datepicker", "label": "Created at", "name": "createdAt", "timepicker": true, "id": _this.idCreatedAt },
                                                 { "view": "datepicker", "label": "Updated at", "name": "updatedAt", "timepicker": true, "id": _this.idUpdatedAt }
                                                 // {
@@ -350,7 +407,7 @@ steal(
                                                             "view": "button",
                                                             "label": lblCancel,
                                                             "width": 80,
-                                                            click: function() {
+                                                            click: function () {
 
                                                                 _this.toList();
 
@@ -375,7 +432,7 @@ steal(
                                                             "view": "button",
                                                             "label": lblSave,
                                                             "width": 80,
-                                                            click: function() {
+                                                            click: function () {
 
                                                                 var isAdd = false;
 
@@ -394,30 +451,30 @@ steal(
 
                                                                     model.attr(values);
                                                                     model.save()
-																		.fail(function(err) {
-																			if (!AD.op.WebixForm.isValidationError(err, form)) {
-																				AD.error.log('Error saving current model ()', { error: err, values: values });
-																			}
-																		})
-																		.then(function(newData) {
-																			if (isAdd) {
+                                                                        .fail(function (err) {
+                                                                            if (!AD.op.WebixForm.isValidationError(err, form)) {
+                                                                                AD.error.log('Error saving current model ()', { error: err, values: values });
+                                                                            }
+                                                                        })
+                                                                        .then(function (newData) {
+                                                                            if (isAdd) {
 
-																				// the new model obj doesn't have the fully populated data
-																				// like a new read would, so perform a lookup and store that:
-																				_this.Model.findOne({ id: newData.getID() })
-																					.fail(function(err) {
-																						AD.error.log('Error looking up new model:', { error: err, newData: newData, id: newData.getID() })
-																					})
-																					.then(function(newModel) {
-																						if (newModel.translate) { newModel.translate(); }
-																						_this.data.unshift(newModel);
-																						_this.toList();
-																					})
+                                                                                // the new model obj doesn't have the fully populated data
+                                                                                // like a new read would, so perform a lookup and store that:
+                                                                                _this.Model.findOne({ id: newData.getID() })
+                                                                                    .fail(function (err) {
+                                                                                        AD.error.log('Error looking up new model:', { error: err, newData: newData, id: newData.getID() })
+                                                                                    })
+                                                                                    .then(function (newModel) {
+                                                                                        if (newModel.translate) { newModel.translate(); }
+                                                                                        _this.data.unshift(newModel);
+                                                                                        _this.toList();
+                                                                                    })
 
-																			} else {
-																				_this.toList();
-																			}
-																		})
+                                                                            } else {
+                                                                                _this.toList();
+                                                                            }
+                                                                        })
 
                                                                 }
 
@@ -442,27 +499,27 @@ steal(
 
                                 $$(_this.idPagerA).clone($$(_this.idPagerB));
 
-                                $$(idSearch).attachEvent("onTimedKeyPress", function() {
+                                $$(idSearch).attachEvent("onTimedKeyPress", function () {
                                     //get user input value
                                     var value = this.getValue().toLowerCase();
 
-                                    $$(_this.idTable).filter(function(obj) {
+                                    $$(_this.idTable).filter(function (obj) {
                                         var label = _this.Model.fieldLabel;
                                         return obj[label].toLowerCase().indexOf(value) != -1;
                                     })
                                 });
 
-
-
+                                $$('filter_popup').setFields(['Default Image', 'Name', 'Description', 'Status', 'Team', 'Created by', 'Start date', 'End date']);
+                                $$('filter_popup').addNewFilter();
                             }); // end Webix.ready()
 
 
                             // resize after tab is shown
-                            $('.crud1FCFActivity').click(function() {
+                            $('.crud1FCFActivity').click(function () {
 
                                 // setImmediate() gives the DOM a chance to display the 
                                 // tab contents before we calculate the sizes:
-                                AD.sal.setImmediate(function() {
+                                AD.sal.setImmediate(function () {
                                     _this.resize();
                                 });
 
@@ -471,46 +528,46 @@ steal(
                         },
 
 
-                        loadData: function() {
+                        loadData: function () {
                             var _this = this;
 
                             this.Model.findAll()
-								.fail(function(err) {
-									AD.error.log('crud1FCFActivity: Error loading Data', { error: err });
-								})
-								.then(function(list) {
-									// make sure they are all translated.
-									list.forEach(function(l) {
-										if (l.translate) { l.translate(); }
+                                .fail(function (err) {
+                                    AD.error.log('crud1FCFActivity: Error loading Data', { error: err });
+                                })
+                                .then(function (list) {
+                                    // make sure they are all translated.
+                                    list.forEach(function (l) {
+                                        if (l.translate) { l.translate(); }
 
-										// Convert to date object
-										if (l.date_start)
-											l.attr('date_start', moment(l.date_start).toDate());
+                                        // Convert to date object
+                                        if (l.date_start)
+                                            l.attr('date_start', moment(l.date_start).toDate());
 
-										if (l.date_end)
-											l.attr('date_end', moment(l.date_end).toDate());
+                                        if (l.date_end)
+                                            l.attr('date_end', moment(l.date_end).toDate());
 
-										if (l.createdAt)
-											l.attr('createdAt', moment(l.createdAt).toDate());
+                                        if (l.createdAt)
+                                            l.attr('createdAt', moment(l.createdAt).toDate());
 
-										if (l.updatedAt)
-											l.attr('updatedAt', moment(l.updatedAt).toDate());
-									});
+                                        if (l.updatedAt)
+                                            l.attr('updatedAt', moment(l.updatedAt).toDate());
+                                    });
 
-									_this.data = list;
-									_this.dataCollection = AD.op.WebixDataCollection(list);
+                                    _this.data = list;
+                                    _this.dataCollection = AD.op.WebixDataCollection(list);
 
-									webix.ready(function() {
+                                    webix.ready(function () {
 
-										$$(_this.idTable).data.sync(_this.dataCollection);
-										$$(_this.idForm).bind(_this.dataCollection);
+                                        $$(_this.idTable).data.sync(_this.dataCollection);
+                                        $$(_this.idForm).bind(_this.dataCollection);
 
-									});
+                                    });
 
-								});
+                                });
                         },
 
-                        toList: function() {
+                        toList: function () {
                             $$(this.idToolbar).showBatch('list');
                             $$(this.idForm).hide();
                             $$(this.idFormButtons).hide();
@@ -520,7 +577,7 @@ steal(
                             $$(this.idPagerB).show();
                         },
 
-                        toForm: function() {
+                        toForm: function () {
                             $$(this.idToolbar).showBatch('form');
 
                             var form = $$(this.idForm);
@@ -529,34 +586,36 @@ steal(
 
                             $$(this.idFormButtons).show();
 
-							var selectedItem = $$(this.idTable).getItem($$(this.idTable).getSelectedId());
+                            var selectedItem = $$(this.idTable).getItem($$(this.idTable).getSelectedId());
 
-							var trans = $.grep(selectedItem.translations, function(t, index) {
-								return t.language_code === AD.lang.currentLanguage;
-							});
+                            if (selectedItem) {
+                                var trans = $.grep(selectedItem.translations, function (t, index) {
+                                    return t.language_code === AD.lang.currentLanguage;
+                                });
 
-							if (trans.length > 0) {
-								$$(this.idName).setValue(trans[0].activity_name);
-								$$(this.idDescription).setValue(trans[0].activity_description);
+                                if (trans.length > 0) {
+                                    $$(this.idName).setValue(trans[0].activity_name);
+                                    $$(this.idDescription).setValue(trans[0].activity_description);
 
-								$$(this.idNameGovt).setValue(trans[0].activity_name_govt);
-								$$(this.idDescriptionGovt).setValue(trans[0].activity_description_govt);
-							}
+                                    $$(this.idNameGovt).setValue(trans[0].activity_name_govt);
+                                    $$(this.idDescriptionGovt).setValue(trans[0].activity_description_govt);
+                                }
 
-							$$(this.idTeam).setValue(selectedItem.team && selectedItem.team.NameMinistryEng ? selectedItem.team.NameMinistryEng : '');
+                                $$(this.idTeam).setValue(selectedItem.team && selectedItem.team.NameMinistryEng ? selectedItem.team.NameMinistryEng : '');
 
-							var createdBy = (selectedItem.createdBy.NameFirstEng ? selectedItem.createdBy.NameFirstEng + ' ' : '') +
-											(selectedItem.createdBy.NameMiddleEng ? selectedItem.createdBy.NameMiddleEng + ' ' : '') +
-											(selectedItem.createdBy.NameLastEng ? selectedItem.createdBy.NameLastEng + ' ' : '');							
-							$$(this.idCreatedBy).setValue(createdBy);
+                                var createdBy = (selectedItem.createdBy.NameFirstEng ? selectedItem.createdBy.NameFirstEng + ' ' : '') +
+                                    (selectedItem.createdBy.NameMiddleEng ? selectedItem.createdBy.NameMiddleEng + ' ' : '') +
+                                    (selectedItem.createdBy.NameLastEng ? selectedItem.createdBy.NameLastEng + ' ' : '');
+                                $$(this.idCreatedBy).setValue(createdBy);
 
-							// $$(this.idApprovedBy).setValue('Approved');
+                                // $$(this.idApprovedBy).setValue('Approved');
 
-							$$(this.idTeam).disable();
-							$$(this.idApprovedBy).disable();
-							$$(this.idCreatedBy).disable();
-							$$(this.idCreatedAt).disable();
-							$$(this.idUpdatedAt).disable();
+                                $$(this.idTeam).disable();
+                                $$(this.idApprovedBy).disable();
+                                $$(this.idCreatedBy).disable();
+                                $$(this.idCreatedAt).disable();
+                                $$(this.idUpdatedAt).disable();
+                            }
 
                             $$(this.idTable).hide();
                             $$(this.idPagerA).hide();
@@ -595,7 +654,7 @@ steal(
                         // },
 
 
-                        resize: function(data) {
+                        resize: function (data) {
 
                             var table = $("#crud1FCFActivity");
                             var width = 0;
@@ -613,11 +672,11 @@ steal(
                         }
 
 
-					});
+                    });
 
 
 
-				});
+                });
 
         });
 
