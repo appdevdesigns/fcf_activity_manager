@@ -53,12 +53,8 @@ steal(
                                 name: "filter_popup",
                                 $init: function (config) {
                                     //functions executed on component initialization
-                                    this.conditionList = ['contains',
-                                        'does not contain',
-                                        'is',
-                                        'is not',
-                                        'is empty',
-                                        'is not empty'];
+                                    this.fieldList = [];
+                                    this.combineCondition = 'And';
                                 },
                                 defaults: {
                                     width: 800,
@@ -73,22 +69,189 @@ steal(
                                     }
                                 },
                                 addNewFilter: function () {
-                                    this.getBody().addView({
+                                    var _this = this;
+                                    var viewIndex = _this.getBody().getChildViews().length - 1;
+
+                                    _this.getBody().addView({
                                         cols: [
-                                            { view: "combo", value: "And", options: ["And", "Or"], width: 80 },
-                                            { view: "combo", options: this.fieldList, value: this.fieldList[0] },
-                                            { view: "combo", options: this.conditionList, value: this.conditionList[0], width: 155 },
-                                            { view: "text" },
+                                            {
+                                                view: "combo", value: _this.combineCondition, options: ["And", "Or"], css: 'combine-condition', width: 80, on: {
+                                                    "onChange": function (newValue, oldValue) {
+                                                        _this.combineCondition = newValue;
+
+                                                        var filterList = $('.combine-condition').webix_combo();
+
+                                                        if ($.isArray(filterList)) {
+                                                            filterList.forEach(function (elm) {
+                                                                elm.setValue(newValue);
+                                                            });
+                                                        }
+                                                        else {
+                                                            filterList.setValue(newValue);
+                                                        }
+
+                                                        _this.filter();
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                view: "combo", options: _this.fieldList, on: {
+                                                    "onChange": function (columnId) {
+                                                        var columnConfig = _this.dataTable.getColumnConfig(columnId);
+                                                        var conditionList = [];
+                                                        var inputView = {};
+
+                                                        switch (columnConfig.filter_type) {
+                                                            case "text":
+                                                                conditionList = [
+                                                                    "contains",
+                                                                    "doesn't contain",
+                                                                    "is",
+                                                                    "is not"
+                                                                ];
+
+                                                                inputView = { view: "text" };
+                                                                break;
+                                                            case "date":
+                                                                conditionList = [
+                                                                    "is before",
+                                                                    "is after",
+                                                                    "is on or before",
+                                                                    "is on or after"
+                                                                ];
+
+                                                                inputView = { view: "datepicker" };
+                                                                break;
+                                                            case "number":
+                                                                conditionList = [
+                                                                    "=",
+                                                                    "≠",
+                                                                    "<",
+                                                                    ">",
+                                                                    "≤",
+                                                                    "≥"
+                                                                ];
+
+                                                                inputView = { view: "text", validate: webix.rules.isNumber };
+                                                                break;
+                                                            case "list":
+                                                                conditionList = [
+                                                                    "equals",
+                                                                    "does not equal"
+                                                                ];
+
+                                                                inputView = { view: "combo" };
+                                                                break;
+                                                        }
+
+                                                        var conditionCombo = this.getParentView().getChildViews()[2];
+                                                        conditionCombo.define("options", conditionList);
+                                                        conditionCombo.refresh();
+
+                                                        this.getParentView().removeView(this.getParentView().getChildViews()[3]);
+                                                        this.getParentView().addView(inputView, 3);
+                                                        this.getParentView().getChildViews()[3].attachEvent("onChange", function (newv, oldv) {
+                                                            _this.filter();
+                                                        });
+
+                                                        _this.filter();
+                                                    }
+                                                }
+                                            },
+                                            { view: "combo", options: [], width: 155, on: { "onChange": function () { _this.filter(); } } },
+                                            {},
                                             {
                                                 view: "button", value: "X", width: 30, click: function () {
                                                     this.getFormView().removeView(this.getParentView());
                                                 }
                                             }
                                         ]
-                                    }, 0);
+                                    }, viewIndex);
                                 },
-                                setFields: function (fieldList) {
-                                    this.fieldList = fieldList;
+                                registerDataTable: function (dataTable) {
+                                    var _this = this;
+                                    _this.dataTable = dataTable;
+                                    _this.dataTable.eachColumn(function (columnId) {
+                                        var columnConfig = _this.dataTable.getColumnConfig(columnId);
+                                        if (columnConfig.filter_type && columnConfig.header && columnConfig.header.length > 0 && columnConfig.header[0].text) {
+                                            _this.fieldList.push({
+                                                id: columnId,
+                                                value: columnConfig.header[0].text
+                                            });
+                                        }
+                                    });
+
+                                    this.addNewFilter();
+                                },
+                                filter: function () {
+                                    var _this = this;
+
+                                    var filterCondition = [];
+
+                                    _this.getChildViews()[0].getChildViews().forEach(function (view, index, viewList) {
+                                        if (index < viewList.length - 1) { // Ignore 'Add a filter' button
+                                            if (view.getChildViews()[1].getValue() && view.getChildViews()[2].getValue()) {
+                                                filterCondition.push({
+                                                    combineCondtion: view.getChildViews()[0].getValue(),
+                                                    fieldName: view.getChildViews()[1].getValue(),
+                                                    operator: view.getChildViews()[2].getValue(),
+                                                    inputValue: view.getChildViews()[3].getValue(),
+                                                });
+                                            }
+                                        }
+                                    });
+
+                                    _this.dataTable.filter(function (obj) {
+                                        var combineCond = (filterCondition && filterCondition.length > 0 ? filterCondition[0].combineCondtion : 'And');
+                                        var isValid = (combineCond === 'And' ? true : false);
+
+                                        filterCondition.forEach(function (cond) {
+                                            var condResult;
+                                            var objValue = _this.dataTable.getColumnConfig(cond.fieldName).filter_value ? _this.dataTable.getColumnConfig(cond.fieldName).filter_value(obj) : obj[cond.fieldName];
+
+                                            switch (cond.operator) {
+                                                // Text filter
+                                                case "contains":
+                                                    condResult = objValue.trim().toLowerCase().indexOf(cond.inputValue.trim().toLowerCase()) > -1;
+                                                    break;
+                                                case "doesn't contain":
+                                                    condResult = objValue.trim().toLowerCase().indexOf(cond.inputValue.trim().toLowerCase()) < 0;
+                                                    break;
+                                                case "is":
+                                                    condResult = objValue.trim().toLowerCase() == cond.inputValue.trim().toLowerCase();
+                                                    break;
+                                                case "is not":
+                                                    condResult = objValue.trim().toLowerCase() != cond.inputValue.trim().toLowerCase();
+                                                    break;
+                                                // Number filter
+                                                case "=":
+                                                    condResult = Number(objValue) == Number(cond.inputValue);
+                                                    break;
+                                                case "≠":
+                                                    condResult = Number(objValue) != Number(cond.inputValue);
+                                                    break;
+                                                case "<":
+                                                    condResult = Number(objValue) < Number(cond.inputValue);
+                                                    break;
+                                                case ">":
+                                                    condResult = Number(objValue) > Number(cond.inputValue);
+                                                    break;
+                                                case "≤":
+                                                    condResult = Number(objValue) <= Number(cond.inputValue);
+                                                    break;
+                                                case "≥":
+                                                    condResult = Number(objValue) >= Number(cond.inputValue);
+                                                    break;
+                                            }
+                                            if (combineCond === 'And') {
+                                                isValid = isValid && condResult;
+                                            } else {
+                                                isValid = isValue || condResult;
+                                            }
+                                        });
+
+                                        return isValid;
+                                    })
                                 }
                             }, webix.ui.popup);
 
@@ -195,9 +358,21 @@ steal(
                                             rowHeight: 100,
                                             columns: [
                                                 { "id": "id", "header": "id", "width": 40 },
-                                                { "id": "default_image", "header": "Default Image", "editor": "text", "template": "<img src='/data/fcf/images/activities/#default_image#' class='openImage' style='max-width: 150px; max-width: 120px;' />", "width": 150 },
+                                                { "id": "default_image", "header": "Default Image", "editor": "text", "filter_type": "text", "template": "<img src='/data/fcf/images/activities/#default_image#' class='openImage' style='max-width: 150px; max-width: 120px;' />", "width": 150 },
                                                 {
-                                                    "id": "name", "header": "Name", "width": 200, "editor": "text", "template": function (r) {
+                                                    "id": "name", "header": "Name", "width": 200, "editor": "text", "filter_type": "text",
+                                                    "filter_value": function (r) {
+                                                        var trans = $.grep(r.translations, function (t, index) {
+                                                            return t.language_code === AD.lang.currentLanguage;
+                                                        });
+
+                                                        if (trans.length > 0) {
+                                                            return trans[0].activity_name + ' ' + trans[0].activity_name_govt;
+                                                        }
+                                                        else
+                                                            return '';
+                                                    },
+                                                    "template": function (r) {
                                                         var trans = $.grep(r.translations, function (t, index) {
                                                             return t.language_code === AD.lang.currentLanguage;
                                                         });
@@ -213,7 +388,19 @@ steal(
                                                     }
                                                 },
                                                 {
-                                                    "id": "name", "header": "Description", "width": 180, "css": "test", "fillspace": true, "template": function (r) {
+                                                    "id": "description", "header": "Description", "width": 180, "css": "test", "fillspace": true, "filter_type": "text",
+                                                    "filter_value": function (r) {
+                                                        var trans = $.grep(r.translations, function (t, index) {
+                                                            return t.language_code === AD.lang.currentLanguage;
+                                                        });
+
+                                                        if (trans.length > 0) {
+                                                            return trans[0].activity_description + ' ' + trans[0].activity_description_govt;
+                                                        }
+                                                        else
+                                                            return '';
+                                                    },
+                                                    "template": function (r) {
                                                         var trans = $.grep(r.translations, function (t, index) {
                                                             return t.language_code === AD.lang.currentLanguage;
                                                         });
@@ -229,24 +416,24 @@ steal(
                                                     }
                                                 },
                                                 {
-                                                    "id": "status", "header": "Status", "width": 90, "template": function (r) {
+                                                    "id": "status", "header": "Status", "width": 90, "filter_type": "list", "template": function (r) {
                                                         return r.status + (r.status === 'approved' && r.approvedBy ? '<br /> By' + r.approvedBy : '');
                                                     }
                                                 },
                                                 {
-                                                    "id": "team", "header": "Team", "width": 140, "template": function (r) {
+                                                    "id": "team", "header": "Team", "width": 140, "filter_type": "list", "template": function (r) {
                                                         return ((r.team && r.team.NameMinistryEng) ? r.team.NameMinistryEng : '');
                                                     }
                                                 },
                                                 {
-                                                    "id": "createdBy", "header": "Created by", "width": 200, "template": function (r) {
+                                                    "id": "createdBy", "header": "Created by", "width": 200, "filter_type": "text", "template": function (r) {
                                                         return (r.createdBy.NameFirstEng ? r.createdBy.NameFirstEng + ' ' : '') +
                                                             (r.createdBy.NameMiddleEng ? r.createdBy.NameMiddleEng + ' ' : '') +
                                                             (r.createdBy.NameLastEng ? r.createdBy.NameLastEng + ' ' : '');
                                                     }
                                                 },
-                                                { "id": "date_start", "header": "Start date", "format": webix.Date.dateToStr("%Y-%m-%d"), "width": 100 },
-                                                { "id": "date_end", "header": "End date", "format": webix.Date.dateToStr("%Y-%m-%d"), "width": 100 },
+                                                { "id": "date_start", "header": "Start date", "filter_type": "date", "format": webix.Date.dateToStr("%Y-%m-%d"), "width": 100 },
+                                                { "id": "date_end", "header": "End date", "filter_type": "date", "format": webix.Date.dateToStr("%Y-%m-%d"), "width": 100 },
                                                 // { "id": "createdAt", "header": "Created at", "format": webix.Date.dateToStr("%Y-%m-%d %h:%i"), "width": 150 },
                                                 // { "id": "updatedAt", "header": "Updated at", "format": webix.Date.dateToStr("%Y-%m-%d %h:%i"), "width": 150, fillspace: true },
 
@@ -509,8 +696,7 @@ steal(
                                     })
                                 });
 
-                                $$('filter_popup').setFields(['Default Image', 'Name', 'Description', 'Status', 'Team', 'Created by', 'Start date', 'End date']);
-                                $$('filter_popup').addNewFilter();
+                                $$('filter_popup').registerDataTable($$(_this.idTable));
                             }); // end Webix.ready()
 
 
