@@ -1,10 +1,11 @@
 steal(
     // List your Controller's dependencies here:
+	'opstools/FCFActivityManager/controllers/CustomFilterPopup.js',
     'opstools/FCFActivities/models/ActivityImage.js',
-    function() {
-        System.import('appdev').then(function() {
+    function () {
+        System.import('appdev').then(function () {
             steal.import('appdev/ad',
-                'appdev/control/control').then(function() {
+                'appdev/control/control').then(function () {
 
 
 					// Namespacing conventions:
@@ -13,7 +14,7 @@ steal(
 
 
 
-						init: function(element, options) {
+						init: function (element, options) {
 
                             this.options = options;
 
@@ -22,12 +23,22 @@ steal(
 
                             this.Model = AD.Model.get('opstools.FCFActivities.ActivityImage');
 
+							this.initControllers();
                             this.initDOM();
                             this.loadData();
                         },
 
 
-                        initDOM: function() {
+                        initControllers: function () {
+
+                            this.controllers = {};  // hold my controller references here.
+
+                            var CustomFilterPopup = AD.Control.get('opstools.FCFActivityManager.CustomFilterPopup');
+                            this.controllers.CustomFilterPopup = new CustomFilterPopup(this.element);
+                        },
+
+
+                        initDOM: function () {
                             var _this = this;
 
                             var ControllerName = "crud1FCFActivityImages";
@@ -41,7 +52,12 @@ steal(
 
                             this.idUploadedBy = this.idForm + "UploadedBy";
 
-                            webix.ready(function() {
+                            webix.ui({
+                                view: "filter_popup",
+                                id: "activity_images_filter_popup"
+                            }).hide();
+
+                            webix.ready(function () {
 
                                 var lblList = AD.lang.label.getLabel('webix.common.list') || 'List*';
                                 var lblNew = AD.lang.label.getLabel('webix.common.new') || 'New*';
@@ -65,7 +81,7 @@ steal(
                                             width: 80,
                                             label: lblList,
                                             batch: 'form',
-                                            click: function() {
+                                            click: function () {
 
                                                 var lblConfirm = AD.lang.label.getLabel('webix.common.confirmSwitchToList') || '*Switch to List without saving any changes?';
 
@@ -73,7 +89,7 @@ steal(
 
 													text: lblConfirm,
 
-													callback: function(result) {
+													callback: function (result) {
 
 														if (result) {
 
@@ -92,7 +108,7 @@ steal(
                                             type: "icon",
                                             label: lblNew,
                                             batch: 'list',
-                                            click: function() {
+                                            click: function () {
 
                                                 $$(_this.idTable).clearSelection();     // visual 
                                                 _this.dataCollection.setCursor(null);   // no data selected
@@ -108,7 +124,8 @@ steal(
                                             icon: "filter",
                                             type: "icon",
                                             label: lblFilter,
-                                            batch: 'list'
+                                            batch: 'list',
+											popup: 'activity_images_filter_popup'
                                         },
                                         {
                                             view: "search",
@@ -140,10 +157,10 @@ steal(
                                             columns: [
                                                 { "id": "activity", "header": "Activity", "width": 70 },
                                                 { "id": "image", "header": "Image", "editor": "text", "template": "<div><img src='#image#' class='openImage' style='max-width: 150px; max-width: 120px;' /></div>", "width": 150 },
-                                                { "id": "caption", "header": "Caption", "editor": "text", "fillspace": true },
-                                                { "id": "caption_govt", "header": "Caption (Govt)", "editor": "text", "fillspace": true },
-                                                { "id": "date", "header": "Date", "width": 100 },
-                                                { "id": "uploadedBy", "header": "Uploaded by", "template": "#displayName#", "width": 140 },
+                                                { "id": "caption", "header": "Caption", "editor": "text", "filter_type": "text", "fillspace": true },
+                                                { "id": "caption_govt", "header": "Caption (Govt)", "editor": "text", "filter_type": "text","fillspace": true },
+                                                { "id": "date", "header": "Date", "filter_type": "date","width": 100 },
+                                                { "id": "uploadedBy", "header": "Uploaded by", "template": "#displayName#", "filter_type": "text", "filter_value": function(r) { return r.displayName; }, "width": 140 },
 
                                                 // { id:"copy",  header:"" , width:40, css:{"text-align":"center"}, template:function(obj) { return "<div class='clone fa fa-copy fa-2 offset-9 rbac-role-list-clone' role-id='"+obj.id+"'  ></div>"; } } ,
                                                 { id: "trash", header: "", width: 40, css: { "text-align": "center" }, template: "<span class='trash'>{common.trashIcon()}</span>" }
@@ -175,7 +192,7 @@ steal(
                                                 // },
 
 
-                                                onItemClick: function(id) {
+                                                onItemClick: function (id) {
 
                                                     _this.dataCollection.setCursor(id);
                                                     _this.toForm();
@@ -184,7 +201,7 @@ steal(
                                             },
 
                                             onClick: {
-												openImage: function(e, id, trg) {
+												openImage: function (e, id, trg) {
 													var imageUrl = $$(_this.idTable).getItem(id)[id.column];
 
 													webix.ui({
@@ -208,7 +225,7 @@ steal(
 
 													return false;
 												},
-												trash: function(e, id) {
+												trash: function (e, id) {
 
 													var model = _this.dataCollection.AD.getModel(id);
 													var lblConfirm = AD.lang.label.getLabel('webix.common.confirmDelete', [model.getLabel()]) || '*Remove : ' + model.getLabel();
@@ -216,15 +233,15 @@ steal(
 
 														text: lblConfirm,
 
-														callback: function(result) {
+														callback: function (result) {
 
 															if (result) {
 
 																_this.dataCollection.AD.destroyModel(id)
-																	.fail(function(err) {
+																	.fail(function (err) {
 																		AD.error.log('Error destroying entry.', { error: err, role: role, id: id, other: 'crud1PermissionRole' });
 																	})
-																	.then(function(oldData) {
+																	.then(function (oldData) {
 
 																		// _this.dom.roleForm.hide();
 
@@ -295,7 +312,7 @@ steal(
 															"view": "button",
 															"label": lblCancel,
 															"width": 80,
-															click: function() {
+															click: function () {
 
 																_this.toList();
 
@@ -320,7 +337,7 @@ steal(
 															"view": "button",
 															"label": lblSave,
 															"width": 80,
-															click: function() {
+															click: function () {
 
 																var isAdd = false;
 
@@ -339,21 +356,21 @@ steal(
 
 																	model.attr(values);
 																	model.save()
-																		.fail(function(err) {
+																		.fail(function (err) {
 																			if (!AD.op.WebixForm.isValidationError(err, form)) {
 																				AD.error.log('Error saving current model ()', { error: err, values: values });
 																			}
 																		})
-																		.then(function(newData) {
+																		.then(function (newData) {
 																			if (isAdd) {
 
 																				// the new model obj doesn't have the fully populated data
 																				// like a new read would, so perform a lookup and store that:
 																				_this.Model.findOne({ id: newData.getID() })
-																					.fail(function(err) {
+																					.fail(function (err) {
 																						AD.error.log('Error looking up new model:', { error: err, newData: newData, id: newData.getID() })
 																					})
-																					.then(function(newModel) {
+																					.then(function (newModel) {
 																						if (newModel.translate) { newModel.translate(); }
 																						_this.data.unshift(newModel);
 																						_this.toList();
@@ -387,27 +404,27 @@ steal(
 
 								$$(_this.idPagerA).clone($$(_this.idPagerB));
 
-								$$(idSearch).attachEvent("onTimedKeyPress", function() {
+								$$(idSearch).attachEvent("onTimedKeyPress", function () {
 									//get user input value
 									var value = this.getValue().toLowerCase();
 
-									$$(_this.idTable).filter(function(obj) {
+									$$(_this.idTable).filter(function (obj) {
 										var label = _this.Model.fieldLabel;
 										return obj[label].toLowerCase().indexOf(value) != -1;
 									})
 								});
 
-
+								$$('activity_images_filter_popup').registerDataTable($$(_this.idTable));
 
 							}); // end Webix.ready()
 
 
 							// resize after tab is shown
-							$('.crud1FCFActivityImages').click(function() {
+							$('.crud1FCFActivityImages').click(function () {
 
 								// setImmediate() gives the DOM a chance to display the 
 								// tab contents before we calculate the sizes:
-								AD.sal.setImmediate(function() {
+								AD.sal.setImmediate(function () {
 									_this.resize();
 								});
 
@@ -416,21 +433,21 @@ steal(
 						},
 
 
-						loadData: function() {
+						loadData: function () {
 							var _this = this;
 
 							this.Model.findAll()
-								.fail(function(err) {
+								.fail(function (err) {
 									AD.error.log('crud1FCFActivityImages: Error loading Data', { error: err });
 								})
-								.then(function(list) {
+								.then(function (list) {
 									// make sure they are all translated.
-									list.forEach(function(l) {
+									list.forEach(function (l) {
 										if (l.translate) { l.translate(); }
 									})
 									_this.data = list;
 									_this.dataCollection = AD.op.WebixDataCollection(list);
-									webix.ready(function() {
+									webix.ready(function () {
 
 										$$(_this.idTable).data.sync(_this.dataCollection);
 										$$(_this.idForm).bind(_this.dataCollection);
@@ -440,7 +457,7 @@ steal(
 								});
 						},
 
-						toList: function() {
+						toList: function () {
 							$$(this.idToolbar).showBatch('list');
 							$$(this.idForm).hide();
 							$$(this.idFormButtons).hide();
@@ -450,7 +467,7 @@ steal(
 							$$(this.idPagerB).show();
 						},
 
-						toForm: function() {
+						toForm: function () {
 							$$(this.idToolbar).showBatch('form');
 
 							var form = $$(this.idForm);
@@ -499,7 +516,7 @@ steal(
 						// },
 
 
-						resize: function(data) {
+						resize: function (data) {
 
 							var table = $("#crud1FCFActivityImages");
 							var width = 0;
