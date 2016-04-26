@@ -120,7 +120,7 @@ steal(
                                                                     "is on or after"
                                                                 ];
 
-                                                                inputView = { view: "datepicker" };
+                                                                inputView = { view: "datepicker", format: columnConfig.format };
                                                                 break;
                                                             case "number":
                                                                 conditionList = [
@@ -140,7 +140,10 @@ steal(
                                                                     "does not equal"
                                                                 ];
 
-                                                                inputView = { view: "combo" };
+                                                                inputView = {
+                                                                    view: "multicombo",
+                                                                    options: columnConfig.filter_options
+                                                                };
                                                                 break;
                                                         }
 
@@ -150,9 +153,10 @@ steal(
 
                                                         this.getParentView().removeView(this.getParentView().getChildViews()[3]);
                                                         this.getParentView().addView(inputView, 3);
-                                                        this.getParentView().getChildViews()[3].attachEvent("onChange", function (newv, oldv) {
-                                                            _this.filter();
-                                                        });
+                                                        if (columnConfig.filter_type === 'text')
+                                                            this.getParentView().getChildViews()[3].attachEvent("onTimedKeyPress", function () { _this.filter(); });
+                                                        else
+                                                            this.getParentView().getChildViews()[3].attachEvent("onChange", function () { _this.filter(); });
 
                                                         _this.filter();
                                                     }
@@ -163,6 +167,7 @@ steal(
                                             {
                                                 view: "button", value: "X", width: 30, click: function () {
                                                     this.getFormView().removeView(this.getParentView());
+                                                    _this.filter();
                                                 }
                                             }
                                         ]
@@ -190,7 +195,7 @@ steal(
 
                                     _this.getChildViews()[0].getChildViews().forEach(function (view, index, viewList) {
                                         if (index < viewList.length - 1) { // Ignore 'Add a filter' button
-                                            if (view.getChildViews()[1].getValue() && view.getChildViews()[2].getValue()) {
+                                            if (view.getChildViews()[1].getValue() && view.getChildViews()[2].getValue() && view.getChildViews()[3].getValue()) {
                                                 filterCondition.push({
                                                     combineCondtion: view.getChildViews()[0].getValue(),
                                                     fieldName: view.getChildViews()[1].getValue(),
@@ -223,6 +228,19 @@ steal(
                                                 case "is not":
                                                     condResult = objValue.trim().toLowerCase() != cond.inputValue.trim().toLowerCase();
                                                     break;
+                                                // Date filter
+                                                case "is before":
+                                                    condResult = objValue < cond.inputValue;
+                                                    break;
+                                                case "is after":
+                                                    condResult = objValue > cond.inputValue;
+                                                    break;
+                                                case "is on or before":
+                                                    condResult = objValue <= cond.inputValue;
+                                                    break;
+                                                case "is on or after":
+                                                    condResult = objValue >= cond.inputValue;
+                                                    break;
                                                 // Number filter
                                                 case "=":
                                                     condResult = Number(objValue) == Number(cond.inputValue);
@@ -242,11 +260,18 @@ steal(
                                                 case "≥":
                                                     condResult = Number(objValue) >= Number(cond.inputValue);
                                                     break;
+                                                // List filter
+                                                case "equals":
+                                                    condResult = cond.inputValue.toLowerCase().indexOf(objValue.trim().toLowerCase()) > -1;
+                                                    break;
+                                                case "does not equal":
+                                                    condResult = cond.inputValue.toLowerCase().indexOf(objValue.trim().toLowerCase()) < 0;
+                                                    break;
                                             }
                                             if (combineCond === 'And') {
                                                 isValid = isValid && condResult;
                                             } else {
-                                                isValid = isValue || condResult;
+                                                isValid = isValid || condResult;
                                             }
                                         });
 
@@ -358,7 +383,7 @@ steal(
                                             rowHeight: 100,
                                             columns: [
                                                 { "id": "id", "header": "id", "width": 40 },
-                                                { "id": "default_image", "header": "Default Image", "editor": "text", "filter_type": "text", "template": "<img src='/data/fcf/images/activities/#default_image#' class='openImage' style='max-width: 150px; max-width: 120px;' />", "width": 150 },
+                                                { "id": "default_image", "header": "Default Image", "editor": "text", "template": "<img src='/data/fcf/images/activities/#default_image#' class='openImage' style='max-width: 150px; max-width: 120px;' />", "width": 150 },
                                                 {
                                                     "id": "name", "header": "Name", "width": 200, "editor": "text", "filter_type": "text",
                                                     "filter_value": function (r) {
@@ -416,17 +441,30 @@ steal(
                                                     }
                                                 },
                                                 {
-                                                    "id": "status", "header": "Status", "width": 90, "filter_type": "list", "template": function (r) {
+                                                    "id": "status", "header": "Status", "width": 90, "filter_type": "list",
+                                                    "filter_options": ['new', 'approved', 'denied', 'translated', 'ready', 'updated'],
+                                                    "filter_value": function (r) {
+                                                        return r.status;
+                                                    },
+                                                    "template": function (r) {
                                                         return r.status + (r.status === 'approved' && r.approvedBy ? '<br /> By' + r.approvedBy : '');
                                                     }
                                                 },
                                                 {
-                                                    "id": "team", "header": "Team", "width": 140, "filter_type": "list", "template": function (r) {
+                                                    "id": "team", "header": "Team", "width": 140, "filter_type": "text",
+                                                    "filter_value": function (r) {
+                                                        return ((r.team && r.team.NameMinistryEng) ? r.team.NameMinistryEng : '');
+                                                    },
+                                                    "template": function (r) {
                                                         return ((r.team && r.team.NameMinistryEng) ? r.team.NameMinistryEng : '');
                                                     }
                                                 },
                                                 {
-                                                    "id": "createdBy", "header": "Created by", "width": 200, "filter_type": "text", "template": function (r) {
+                                                    "id": "createdBy", "header": "Created by", "width": 200, "filter_type": "text",
+                                                    "filter_value": function (r) {
+                                                        return r.createdBy.NameFirstEng + ' ' + r.createdBy.NameMiddleEng + ' ' + r.createdBy.NameLastEng;
+                                                    },
+                                                    "template": function (r) {
                                                         return (r.createdBy.NameFirstEng ? r.createdBy.NameFirstEng + ' ' : '') +
                                                             (r.createdBy.NameMiddleEng ? r.createdBy.NameMiddleEng + ' ' : '') +
                                                             (r.createdBy.NameLastEng ? r.createdBy.NameLastEng + ' ' : '');
