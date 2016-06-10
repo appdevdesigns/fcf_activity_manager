@@ -3,7 +3,7 @@ steal(
     'opstools/FCFActivityManager/controllers/CustomFilterPopup.js',
     'opstools/FCFActivityManager/models/FCFActivity.js',
     function () {
-        System.import('appdev').then(function () {
+        System.import('appdev', 'dropzone').then(function () {
             steal.import('appdev/ad',
                 'appdev/control/control').then(function () {
 
@@ -163,7 +163,22 @@ steal(
                                             rowHeight: 100,
                                             columns: [
                                                 { "id": "id", "header": "id", "width": 40 },
-                                                { "id": "default_image", "header": "Default Image", "editor": "text", "template": "<img src='/data/fcf/images/activities/#default_image#' class='openImage' style='max-width: 150px; max-width: 120px;' />", "width": 150 },
+                                                // { "id": "default_image", "header": "Default Image", "editor": "text", "template": "<img src='/data/fcf/images/activities/#default_image#' class='openImage' style='max-width: 150px; max-width: 120px;' />", "width": 150 },
+                                                { "id": "default_image", "header": "Default Image", "editor": "text", "template": function(obj) { 
+                                                    // var $el = '<span>null</span>';
+                                                    // if (obj.default_image) {
+                                                    //     $el = '<div adopimage="true" opimage-url="/data/fcf/images/activities/'+obj.default_image+'"></div>';
+                                                    //     $el = $($el);
+                                                    //     new AD.op.Image($el, {width:150});
+                                                    // }
+                                                    // return $el;
+
+                                                    if (obj.default_image) { 
+                                                        return '<div adopimage="true" opimage-url="/data/fcf/images/activities/'+obj.default_image+'"></div>' 
+                                                    } else { 
+                                                        return 'null'
+                                                    } 
+                                                } , "width": 150 },
                                                 {
                                                     "id": "name", "header": "Name", "width": 200, "editor": "text", "filter_type": "text",
                                                     "filter_value": function (r) {
@@ -283,6 +298,13 @@ steal(
 
                                                 //     }  
                                                 // },
+                                                onAfterRender:function(){
+
+                                                    $('div[view_id="'+_this.idTable+'"] div[adopimage]').each(function(indx, el){
+
+                                                        new AD.op.Image(el, {width:150});
+                                                    })
+                                                },
 
 
                                                 onItemClick: function (id) {
@@ -500,7 +522,6 @@ steal(
                                 });
 
                                 _this.toList();
-
 
                                 $$(_this.idPagerA).clone($$(_this.idPagerB));
 
