@@ -172,7 +172,7 @@ steal(
                                                     //     new AD.op.Image($el, {width:150});
                                                     // }
                                                     // return $el;
-                                                    
+
                                                     if (obj.default_image) { 
                                                         return '<div adopimage="true" opimage-url="/data/fcf/images/activities/'+obj.default_image+'"></div>' 
                                                     } else { 
@@ -298,8 +298,8 @@ steal(
 
                                                 //     }  
                                                 // },
-                                                onStoreLoad:function(){
-webix.message("on:onStoreLoad()");
+                                                onAfterRender:function(){
+
                                                     $('div[view_id="'+_this.idTable+'"] div[adopimage]').each(function(indx, el){
 
                                                         new AD.op.Image(el, {width:150});
@@ -523,23 +523,6 @@ webix.message("on:onStoreLoad()");
 
                                 _this.toList();
 
-
-                                $$(_this.idTable).attachEvent("onStoreLoad", function(){
-webix.message("attachEvent.onStoreLoad()");
-                                    $('div[view_id="'+_this.idTable+'"] div[adopimage]').each(function(indx, el){
-
-                                            new AD.op.Image(el, {width:150});
-                                        })
-                                });
-                                $$(_this.idTable).attachEvent("data->onParse", function(driver, data){
-                                    //for json data
-                                    webix.message("Count of records "+data.length);
-                                   $('div[view_id="'+_this.idTable+'"] div[adopimage]').each(function(indx, el){
-
-                                            new AD.op.Image(el, {width:150});
-                                        })
-                                });
-
                                 $$(_this.idPagerA).clone($$(_this.idPagerB));
 
                                 $$(idSearch).attachEvent("onTimedKeyPress", function () {
@@ -603,11 +586,6 @@ webix.message("attachEvent.onStoreLoad()");
 
                                         $$(_this.idTable).data.sync(_this.dataCollection);
                                         $$(_this.idForm).bind(_this.dataCollection);
-
-                                        $('div[view_id="'+_this.idTable+'"] div[adopimage]').each(function(indx, el){
-
-                                            new AD.op.Image(el, {width:150});
-                                        })
 
                                     });
 

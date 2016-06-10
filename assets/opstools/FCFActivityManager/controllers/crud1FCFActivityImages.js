@@ -156,7 +156,14 @@ steal(
 											rowHeight: 100,
                                             columns: [
                                                 { "id": "activity", "header": "Activity", "width": 70 },
-                                                { "id": "image", "header": "Image", "editor": "text", "template": "<div><img src='#image#' class='openImage' style='max-width: 150px; max-width: 120px;' /></div>", "width": 150 },
+                                                { "id": "image", "header": "Image", "editor": "text", "template": function(obj) {
+
+                                                	if (obj.image) {
+                                                		return '<div adopimage="true" opimage-url="'+obj.image+'"></div>';
+                                                	} else {
+                                                		return "null";
+                                                	}
+                                                }, "width": 150 },
                                                 { "id": "caption", "header": "Caption", "editor": "text", "filter_type": "text", "fillspace": true },
                                                 { "id": "caption_govt", "header": "Caption (Govt)", "editor": "text", "filter_type": "text","fillspace": true },
                                                 { "id": "date", "header": "Date", "filter_type": "date","width": 100 },
@@ -190,6 +197,13 @@ steal(
 
                                                 //     }  
                                                 // },
+                                                onAfterRender:function(){
+
+                                                    $('div[view_id="'+_this.idTable+'"] div[adopimage]').each(function(indx, el){
+
+                                                        new AD.op.Image(el, {width:150});
+                                                    })
+                                                },
 
 
                                                 onItemClick: function (id) {
