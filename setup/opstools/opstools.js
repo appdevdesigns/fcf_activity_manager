@@ -7,11 +7,11 @@ module.exports = [
 
     { 
         key:'adroit.activityManager', 
-        permissions:'fcf.activitymanager.view, adcore.developer', 
+        permissions:'fcf.activitymanager.view', 
         icon:'fa-sticky-note-o', 
         controller: 'FCFActivityManager',
-        label: 'opp.toolFCFActivityManager',
-        context:'opsportal',
+        label: 'Adroit Activity Manager',
+        // context:'opsportal',
         isController:true, 
         options:{}, 
         version:'0' 
