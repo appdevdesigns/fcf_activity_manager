@@ -29,8 +29,8 @@ module.exports = {
 
     actions:[
         { 
-            action_key:'[moduleName].view', 
-            action_description:'Allows the user to access the [moduleName] tool.' 
+            action_key:'fcf.activitymanager.view', 
+            action_description:'Allows the user to access the Adroit Activity Manager tool.' 
         },
         // { 
         //     action_key:'[moduleName].action.create', 
