@@ -1,2 +1,7 @@
 
 /*  Add any css definitions for your project here */
+/* No padding/margin column */
+.fcfactivitymanager-column-no-padding div {
+	padding: 0px !important;
+	margin: 0px !important;
+}

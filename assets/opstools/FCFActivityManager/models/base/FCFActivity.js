@@ -15,7 +15,7 @@ steal(
 						return {};
 					},
 					// associations:['actions', 'permissions'],
-					// multilingualFields:['role_label', 'role_description'],
+					multilingualFields:['activity_name', 'activity_name_govt', 'activity_description', 'activity_description_govt' ],
 					// validations: {
 					//     "role_label" : [ 'notEmpty' ],
 					//     "role_description" : [ 'notEmpty' ]

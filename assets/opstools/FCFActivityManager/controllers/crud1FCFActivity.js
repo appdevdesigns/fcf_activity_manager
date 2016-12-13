@@ -164,7 +164,7 @@ steal(
                                             columns: [
                                                 { "id": "id", "header": "id", "width": 40 },
                                                 // { "id": "default_image", "header": "Default Image", "editor": "text", "template": "<img src='/data/fcf/images/activities/#default_image#' class='openImage' style='max-width: 150px; max-width: 120px;' />", "width": 150 },
-                                                { "id": "default_image", "header": "Default Image", "editor": "text", "template": function(obj) { 
+                                                { "id": "default_image", "header": "Default Image", "editor": "text", "css":"fcfactivitymanager-column-no-padding", "template": function(obj) { 
                                                     // var $el = '<span>null</span>';
                                                     // if (obj.default_image) {
                                                     //     $el = '<div adopimage="true" opimage-url="/data/fcf/images/activities/'+obj.default_image+'"></div>';
@@ -174,10 +174,13 @@ steal(
                                                     // return $el;
 
                                                     if (obj.default_image) { 
-                                                        return '<div adopimage="true" opimage-url="/data/fcf/images/activities/'+obj.default_image+'"></div>' 
+                                                        // return '<div adopimage="true" opimage-url="/data/fcf/images/activities/'+obj.default_image+'"></div>' 
+                                                        // Back to displaying default scaled image:
+                                                        return '<img src="/data/fcf/images/activities/'+obj.default_image+'">'
                                                     } else { 
                                                         return 'null'
                                                     } 
+
                                                 } , "width": 150 },
                                                 {
                                                     "id": "name", "header": "Name", "width": 200, "editor": "text", "filter_type": "text",
@@ -300,10 +303,10 @@ steal(
                                                 // },
                                                 onAfterRender:function(){
 
-                                                    $('div[view_id="'+_this.idTable+'"] div[adopimage]').each(function(indx, el){
+                                                    // $('div[view_id="'+_this.idTable+'"] div[adopimage]').each(function(indx, el){
 
-                                                        new AD.op.Image(el, {width:150});
-                                                    })
+                                                    //     new AD.op.Image(el, {width:150});
+                                                    // })
                                                 },
 
 
@@ -391,10 +394,10 @@ steal(
                                             },
                                             elements: [
                                                 { "view": "text", "label": "Default image", "name": "default_image", "type": "text" },
-                                                { "view": "text", "label": "Name", "name": "name", "type": "text", "required": false, "id": _this.idName },
-                                                { "view": "text", "label": "Name (Govt)", "name": "name_govt", "type": "text", "required": false, "id": _this.idNameGovt },
-                                                { "view": "textarea", "label": "Description", "name": "description", "height": 130, "type": "text", "required": false, "id": _this.idDescription },
-                                                { "view": "textarea", "label": "Description (Govt)", "name_govt": "description", "height": 130, "type": "text", "required": false, "id": _this.idDescriptionGovt },
+                                                { "view": "text", "label": "Name", "name": "activity_name", "type": "text", "required": false, "id": _this.idName },
+                                                { "view": "text", "label": "Name (Govt)", "name": "activity_name_govt", "type": "text", "required": false, "id": _this.idNameGovt },
+                                                { "view": "textarea", "label": "Description", "name": "activity_description", "height": 130, "type": "text", "required": false, "id": _this.idDescription },
+                                                { "view": "textarea", "label": "Description (Govt)", "name": "activity_description_govt", "height": 130, "type": "text", "required": false, "id": _this.idDescriptionGovt },
                                                 { "view": "text", "label": "Status", "name": "status", "type": "text" },
                                                 { "view": "datepicker", "label": "Start date", "name": "date_start", "timepicker": false },
                                                 { "view": "datepicker", "label": "End date", "name": "date_end", "timepicker": false },
@@ -476,6 +479,30 @@ steal(
                                                                     }
                                                                     var values = form.getValues();
 
+                                                                    // make sure we only update the following fields:
+                                                                    var fieldsAllowedToUpdate = [
+                                                                        'date_start', 
+                                                                        'date_end', 
+                                                                        'default_image', 
+                                                                        'status', 
+                                                                        'activity_name', 
+                                                                        'activity_name_govt', 
+                                                                        'activity_description', 
+                                                                        'activity_description_govt' 
+                                                                    ];
+
+                                                                    // remove embedded field references:
+                                                                    for (var v in values) {
+                                                                        if (fieldsAllowedToUpdate.indexOf(v) == -1) {
+                                                                            delete values[v];
+                                                                        }
+                                                                    }
+
+                                                                    // don't send an invalid date_end value
+                                                                    if (values.date_end == '') {
+                                                                        delete values.date_end;
+                                                                    }
+
                                                                     model.attr(values);
                                                                     model.save()
                                                                         .fail(function (err) {
@@ -493,12 +520,13 @@ steal(
                                                                                         AD.error.log('Error looking up new model:', { error: err, newData: newData, id: newData.getID() })
                                                                                     })
                                                                                     .then(function (newModel) {
-                                                                                        if (newModel.translate) { newModel.translate(); }
+                                                                                        _this.prepareEntry(newModel);
                                                                                         _this.data.unshift(newModel);
                                                                                         _this.toList();
                                                                                     })
 
                                                                             } else {
+                                                                                _this.prepareEntry(model);
                                                                                 _this.toList();
                                                                             }
                                                                         })
@@ -553,6 +581,24 @@ steal(
                         },
 
 
+                        prepareEntry:function(l) {
+                            if (l.translate) { l.translate(); }
+
+                            // Convert to date object
+                            if (l.date_start)
+                                l.attr('date_start', moment(l.date_start).toDate());
+
+                            if (l.date_end)
+                                l.attr('date_end', moment(l.date_end).toDate());
+
+                            if (l.createdAt)
+                                l.attr('createdAt', moment(l.createdAt).toDate());
+
+                            if (l.updatedAt)
+                                l.attr('updatedAt', moment(l.updatedAt).toDate());
+                        },
+
+
                         loadData: function () {
                             var _this = this;
 
@@ -563,20 +609,9 @@ steal(
                                 .then(function (list) {
                                     // make sure they are all translated.
                                     list.forEach(function (l) {
-                                        if (l.translate) { l.translate(); }
 
-                                        // Convert to date object
-                                        if (l.date_start)
-                                            l.attr('date_start', moment(l.date_start).toDate());
+                                        _this.prepareEntry(l);
 
-                                        if (l.date_end)
-                                            l.attr('date_end', moment(l.date_end).toDate());
-
-                                        if (l.createdAt)
-                                            l.attr('createdAt', moment(l.createdAt).toDate());
-
-                                        if (l.updatedAt)
-                                            l.attr('updatedAt', moment(l.updatedAt).toDate());
                                     });
 
                                     _this.data = list;
