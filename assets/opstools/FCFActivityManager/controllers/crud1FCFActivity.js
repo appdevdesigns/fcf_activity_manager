@@ -559,7 +559,7 @@ steal(
 
                                     $$(_this.idTable).filter(function (obj) {
                                         var label = _this.Model.fieldLabel;
-                                        return obj[label].toLowerCase().indexOf(value) != -1;
+                                        return (obj[label] && (obj[label].toLowerCase().indexOf(value) != -1));
                                     })
                                 });
 

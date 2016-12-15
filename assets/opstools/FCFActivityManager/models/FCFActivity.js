@@ -15,7 +15,7 @@ steal(
 							destroy: 'DELETE /fcf_activity_manager/fcfactivity/{id}',
 							describe: function() {},   // returns an object describing the Model definition
 							fieldId: 'id',             // which field is the ID
-							fieldLabel:'null'      // which field is considered the Label
+							fieldLabel:'activity_name'      // which field is considered the Label
 					*/
 				}, {
 						/*

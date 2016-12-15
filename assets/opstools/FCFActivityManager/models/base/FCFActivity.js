@@ -21,7 +21,7 @@ steal(
 					//     "role_description" : [ 'notEmpty' ]
 					// },
 					fieldId: 'id',
-					fieldLabel: 'null'
+					fieldLabel: 'activity_name'
 				}, {
 						// model: function() {
 						//     return AD.Model.get('FcfActivityManager.FCFActivity'); //AD.models.FcfActivityManager.FCFActivity;
