@@ -6,8 +6,21 @@
 	margin: 0px !important;
 }
 
+.fcfactivitymanager-column-image {
+	vertical-align: top !important;
+	height: 120px;
+	line-height: 120px;
+}
+
+.fcfactivitymanager-column-image-download {
+	width: 100%;
+	text-align: center;
+	height: 20px;
+	line-height: 20px;
+}
+
 .fcfactivitymanager-column-tagged-people div {
 	line-height: 100% !important;
-	padding-top: 10px;
+	padding-top: 10px !important;
 	white-space: normal !important;
 }

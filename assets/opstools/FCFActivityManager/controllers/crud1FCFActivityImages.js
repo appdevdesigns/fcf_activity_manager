@@ -153,15 +153,15 @@ steal(
                                             view: "datatable",
                                             id: _this.idTable,
                                             pager: _this.idPagerA,
-											rowHeight: 100,
+											rowHeight: 140,
                                             columns: [
                                                 { "id": "activity", "header": "Activity", "width": 70 },
                                                 { "id": "image", "header": "Image", "editor": "text", "template": function(obj) {
 
                                                 	if (obj.image) {
                                                 		return (
-															'<div adopimage="true" opimage-url="'+obj.image+'"></div>' + 
-															'<div style="width: 100%; text-align: center;">' +
+															'<div adopimage="true" opimage-url="'+obj.image+'" class="fcfactivitymanager-column-image"></div>' + 
+															'<div class="fcfactivitymanager-column-image-download">' +
 															'<a href="' + obj.fullImageUrl + '" download="activity_image.jpg" class="downloadImage">Download</a>' +
 															'</div>');
                                                 	} else {
