@@ -159,7 +159,11 @@ steal(
                                                 { "id": "image", "header": "Image", "editor": "text", "template": function(obj) {
 
                                                 	if (obj.image) {
-                                                		return '<div adopimage="true" opimage-url="'+obj.image+'"></div>';
+                                                		return (
+															'<div adopimage="true" opimage-url="'+obj.image+'"></div>' + 
+															'<div style="width: 100%; text-align: center;">' +
+															'<a href="' + obj.fullImageUrl + '" download="activity_image.jpg" class="downloadImage">Download</a>' +
+															'</div>');
                                                 	} else {
                                                 		return "null";
                                                 	}
@@ -167,6 +171,7 @@ steal(
                                                 { "id": "caption", "header": "Caption", "editor": "text", "filter_type": "text", "fillspace": true },
                                                 { "id": "caption_govt", "header": "Caption (Govt)", "editor": "text", "filter_type": "text","fillspace": true },
                                                 { "id": "date", "header": "Date", "filter_type": "date","width": 100 },
+												{ "id": "taggedPeople", "header": "Tagged people", "template": function(item) { return item.taggedPeopleNames.join(', '); }, "filter_type": "text", "filter_value": function(item) { return item.taggedPeopleNames.join(' '); }, "width": 140, "css": "fcfactivitymanager-column-tagged-people" },
                                                 { "id": "uploadedBy", "header": "Uploaded by", "template": "#displayName#", "filter_type": "text", "filter_value": function(r) { return r.displayName; }, "width": 140 },
 
                                                 // { id:"copy",  header:"" , width:40, css:{"text-align":"center"}, template:function(obj) { return "<div class='clone fa fa-copy fa-2 offset-9 rbac-role-list-clone' role-id='"+obj.id+"'  ></div>"; } } ,
@@ -237,6 +242,9 @@ steal(
 														width: 700,
 													}).show();
 
+													return false;
+												},
+												downloadImage: function() {
 													return false;
 												},
 												trash: function (e, id) {
@@ -458,6 +466,9 @@ steal(
 									// make sure they are all translated.
 									list.forEach(function (l) {
 										if (l.translate) { l.translate(); }
+
+										// Set full image url to image object
+										l.attr('fullImageUrl', l.getFullImageUrl());
 									})
 									_this.data = list;
 									_this.dataCollection = AD.op.WebixDataCollection(list);

@@ -5,3 +5,9 @@
 	padding: 0px !important;
 	margin: 0px !important;
 }
+
+.fcfactivitymanager-column-tagged-people div {
+	line-height: 100% !important;
+	padding-top: 10px;
+	white-space: normal !important;
+}
