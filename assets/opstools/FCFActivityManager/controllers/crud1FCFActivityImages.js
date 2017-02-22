@@ -290,6 +290,7 @@ steal(
 											view: "form",
 											id: _this.idForm,
 											type: "line",
+											css: 'fcfactivitymanager-edit-form',
 											elementsConfig: {
 												labelPosition: "top",
 												//                                on:{ onchange:function(newv, oldv){  
