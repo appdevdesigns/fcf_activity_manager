@@ -211,7 +211,7 @@ steal(
                                                 },
 
 
-                                                onItemClick: function (id) {
+                                                onItemDblClick: function (id) {
 
                                                     _this.dataCollection.setCursor(id);
                                                     _this.toForm();
