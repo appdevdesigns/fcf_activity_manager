@@ -155,7 +155,7 @@ steal(
                                             pager: _this.idPagerA,
 											rowHeight: 140,
                                             columns: [
-                                                { "id": "activity", "header": "Activity", "width": 70 },
+                                                { "id": "activity", "header": "Activity", "width": 70, "filter_type": "number" },
                                                 { "id": "image", "header": "Image", "editor": "text", "template": function(obj) {
 
                                                 	if (obj.image) {
