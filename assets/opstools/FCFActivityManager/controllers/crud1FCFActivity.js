@@ -277,7 +277,6 @@ steal(
                                                 { id: "trash", header: "", width: 40, css: { "text-align": "center" }, template: "<span class='trash'>{common.trashIcon()}</span>" }
                                             ],
 
-                                            select: "row",
                                             yCount: 15,
                                             scrollY: false,
                                             scrollX: false,
