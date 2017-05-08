@@ -171,6 +171,7 @@ steal(
                                                 { "id": "caption", "header": "Caption", "editor": "text", "filter_type": "text", "fillspace": true },
                                                 { "id": "caption_govt", "header": "Caption (Govt)", "editor": "text", "filter_type": "text","fillspace": true },
                                                 { "id": "date", "header": "Date", "filter_type": "date","width": 100 },
+												{ "id": "status", "header": "Status", "filter_type": "text","width": 100 },
 												{ "id": "taggedPeople", "header": "Tagged people", "template": function(item) { return item.taggedPeopleNames.join(', '); }, "filter_type": "text", "filter_value": function(item) { return item.taggedPeopleNames.join(' '); }, "width": 140, "css": "fcfactivitymanager-column-tagged-people" },
                                                 { "id": "uploadedBy", "header": "Uploaded by", "template": "#displayName#", "filter_type": "text", "filter_value": function(r) { return r.displayName; }, "width": 140 },
 
