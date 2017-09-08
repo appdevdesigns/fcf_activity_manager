@@ -7,6 +7,7 @@ steal(
 				// Namespacing conventions:
 				// AD.Model.extend('[application].[Model]', {static}, {instance} );  --> Object
 				AD.Model.extend('opstools.FCFActivityManager.FCFActivity', {
+					requestTranslation: 'POST /fcf_activity_manager/requesttranslation/{id}'
 					/*
 							findAll: 'GET /fcf_activity_manager/fcfactivity',
 							findOne: 'GET /fcf_activity_manager/fcfactivity/{id}',
