@@ -23,6 +23,7 @@ module.exports = {
   'get /*(^.*)' : 'fcf_activity_manager/PluginController.profile'
 
   */
+  'post /fcf_acitivity_mananger/requesttranslation/:id':'fcf_activity_manager/FCFActivityController.requestTranslation',
 
 
 };

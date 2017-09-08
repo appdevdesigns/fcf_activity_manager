@@ -64,6 +64,9 @@ steal(
                                 var lblFilter = AD.lang.label.getLabel('webix.common.filter') || 'Filter*';
                                 var lblCancel = AD.lang.label.getLabel('webix.common.cancel') || 'Cancel*';
                                 var lblSave = AD.lang.label.getLabel('webix.common.save') || 'Save*';
+                                var lblTranslate = AD.lang.label.getLabel('webix.common.translate') || 'Request Translation*';
+                                var lblTranslateCreate = AD.lang.label.getLabel('webix.common.translatecreate') || 'Translation Request Created*';
+                                var lblTranslateCreateInfo = AD.lang.label.getLabel('webix.common.translatecreateinfo') || 'You can adjust the translation in the 'Process Translation' tool.*';
 
 
                                 var toolbar1 = {
@@ -218,6 +221,7 @@ steal(
 
                                                     _this.dataCollection.setCursor(id);
                                                     _this.toForm();
+						
                                                 }
 
                                             },
@@ -344,6 +348,20 @@ steal(
 
 															}
 														},
+														{
+															"view": "button",
+															id: "translateButton",
+															"label": lblTranslate,
+															"width": 160,
+															click: function () {
+																var model = _this.dataCollection.AD.currModel();
+																var form = $$(_this.idForm);
+																var values = form.getValues();
+																model.attr(values);
+																_this.addToTranslate(model);
+
+															}
+														},
 														/*
 														{
 															"view": "button",
@@ -462,7 +480,8 @@ steal(
 						loadData: function () {
 							var _this = this;
 
-							this.Model.findAll()
+							var sixMonthsAgo = moment().subtract(5, 'months').format("YYYY-MM-DD"); 
+							this.Model.findAll({ date: { '>': sixMonthsAgo }})
 								.fail(function (err) {
 									AD.error.log('crud1FCFActivityImages: Error loading Data', { error: err });
 								})
@@ -494,6 +513,88 @@ steal(
 							$$(this.idTable).show();
 							$$(this.idPagerA).show();
 							$$(this.idPagerB).show();
+						},
+
+						addToTranslate: function (options) {
+							$$("translateButton").disable();
+							var request = {
+
+							    "actionKey": "fcf.activities.translate",
+							    "userID": options.displayName,
+							    "callback": "fcf.activities.image.translated",
+							    "reference": {"id":options.id.toString()},
+						    
+							    "model": "fcfactivityimagestrans",
+							    "modelCond": {"fcfactivityimages":options.id.toString()},
+
+							    "toLanguageCode": "th",
+
+							    "menu": {
+								"icon": "fa-photo",
+								"action": {
+								    "key": "fcf.activityapproval.updatedImage",
+								    "context": "opstool-FCFActivities"
+								},
+								"fromLanguage": "en",
+								"toLanguage": "th",
+								'itemName': options.caption,
+								"createdBy": options.displayName,
+								"date": moment().format("MMMM D, YYYY")
+							    },
+							    "form": {
+								"data": {
+								    //"fields": options.fields,
+								    //"labels": options.labels,
+								    "optionalInfo": {"image": options.image}
+								},
+								"view": "/opstools/FCFActivities/views/FCFActivities/imageTranslation.ejs"
+							    }
+							}
+							AD.comm.service.get({url:'/fcf_activities/originalactivityimage/'+options.id})
+							.fail(function(err) {
+								console.error('!!!! FCFActivities: error getting /fcf_activities/originalactivityimage/', err);
+								$$("translateButton").enable();
+							})
+							.then(function(data) {
+
+								if (data.data) {
+							
+									var trans = data.data;
+									request.form.data.fields = {
+										"caption": {
+											"en": trans.translations.filter(function(currentValue) { return currentValue.language_code == "en" })[0].caption,
+											"th": trans.translations.filter(function(currentValue) { return currentValue.language_code == "th" })[0].caption,
+										},
+										"caption_govt": {
+											"en": trans.translations.filter(function(currentValue) { return currentValue.language_code == "en" })[0].caption_govt,
+											"th": trans.translations.filter(function(currentValue) { return currentValue.language_code == "th" })[0].caption_govt,
+										}
+									}
+									request.form.data.labels = {
+										"caption": {
+											"en": "Caption:",
+											"th": "คำบรรยายใต้ภาพ"
+										}
+									}
+									AD.comm.service.post({url:'/fcf_acitivity_mananger/requesttranslation/'+options.id, params:request})
+									.fail(function(err) {
+										console.error('!!!! FCFActivities: error getting /fcf_acitivity_mananger/requesttranslation/', err);
+										$$("translateButton").enable();
+									})
+									.then(function(data) {
+									    	webix.alert({
+											title:lblTranslateCreate,
+											text:lblTranslateCreateInfo
+									    	});
+										$$("translateButton").enable();
+									});
+								} else {
+									console.warn('... FCFActivities: /fcf_activities/originalactivityimage/ did not find an entry!');
+									$$("translateButton").enable();
+								}
+
+
+							});
 						},
 
 						toForm: function () {
