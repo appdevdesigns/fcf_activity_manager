@@ -260,11 +260,10 @@ steal(
                                                 {
                                                     "id": "createdBy", "header": "Created by", "width": 200, "filter_type": "text",
                                                     "filter_value": function (r) {
-                                                        return r.createdBy.NameFirstEng + ' ' + r.createdBy.NameMiddleEng + ' ' + r.createdBy.NameLastEng;
+                                                        return r.createdBy.NameFirstEng + ' ' + r.createdBy.NameLastEng;
                                                     },
                                                     "template": function (r) {
                                                         return (r.createdBy.NameFirstEng ? r.createdBy.NameFirstEng + ' ' : '') +
-                                                            (r.createdBy.NameMiddleEng ? r.createdBy.NameMiddleEng + ' ' : '') +
                                                             (r.createdBy.NameLastEng ? r.createdBy.NameLastEng + ' ' : '');
                                                     }
                                                 },
@@ -664,7 +663,6 @@ steal(
                                 $$(this.idTeam).setValue(selectedItem.team && selectedItem.team.NameMinistryEng ? selectedItem.team.NameMinistryEng : '');
 
                                 var createdBy = (selectedItem.createdBy.NameFirstEng ? selectedItem.createdBy.NameFirstEng + ' ' : '') +
-                                    (selectedItem.createdBy.NameMiddleEng ? selectedItem.createdBy.NameMiddleEng + ' ' : '') +
                                     (selectedItem.createdBy.NameLastEng ? selectedItem.createdBy.NameLastEng + ' ' : '');
                                 $$(this.idCreatedBy).setValue(createdBy);
 

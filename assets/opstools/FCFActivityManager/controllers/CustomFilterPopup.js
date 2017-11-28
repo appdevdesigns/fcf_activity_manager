@@ -182,6 +182,7 @@ steal(
                                         filterCondition.forEach(function (cond) {
                                             var condResult;
                                             var objValue = _this.dataTable.getColumnConfig(cond.fieldName).filter_value ? _this.dataTable.getColumnConfig(cond.fieldName).filter_value(obj) : obj[cond.fieldName];
+                                            if (typeof objValue == "undefined") return false;
 
                                             switch (cond.operator) {
                                                 // Text filter

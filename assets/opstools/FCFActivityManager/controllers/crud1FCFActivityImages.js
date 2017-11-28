@@ -51,6 +51,8 @@ steal(
                             this.idFormButtons = this.idForm + "Buttons";
 
                             this.idUploadedBy = this.idForm + "UploadedBy";
+                            this.idImage = this.idForm + "Image";
+                            this.idImagePreview = this.idForm + "ImagePreview";
 
                             webix.ui({
                                 view: "filter_popup",
@@ -66,7 +68,7 @@ steal(
                                 var lblSave = AD.lang.label.getLabel('webix.common.save') || 'Save*';
                                 var lblTranslate = AD.lang.label.getLabel('webix.common.translate') || 'Request Translation*';
                                 var lblTranslateCreate = AD.lang.label.getLabel('webix.common.translatecreate') || 'Translation Request Created*';
-                                var lblTranslateCreateInfo = AD.lang.label.getLabel('webix.common.translatecreateinfo') || 'You can adjust the translation in the 'Process Translation' tool.*';
+                                var lblTranslateCreateInfo = AD.lang.label.getLabel('webix.common.translatecreateinfo') || 'You can adjust the translation in the Process Translation tool.*';
 
 
                                 var toolbar1 = {
@@ -104,13 +106,14 @@ steal(
                                                 return false;
                                             }
                                         },
-                                        {
+                                        /*{
                                             view: "button",
                                             width: 80,
                                             icon: "plus",
                                             type: "icon",
                                             label: lblNew,
                                             batch: 'list',
+                                            hidden: true,
                                             click: function () {
 
                                                 $$(_this.idTable).clearSelection();     // visual 
@@ -120,7 +123,7 @@ steal(
 
                                                 _this.toForm();
                                             }
-                                        },
+                                        },*/
                                         {
                                             view: "button",
                                             width: 80,
@@ -139,7 +142,8 @@ steal(
                                         {
                                             view: "pager",
                                             id: _this.idPagerA,
-                                            template: "{common.prev()} {common.pages()} {common.next()}",
+                                            template: "{common.prev()} {common.pages()} {common.next()} Total Images: #count#",
+					    css: "fcf-activity-manager-pager",
                                             size: 15,
                                             group: 5,
                                             batch: 'list'
@@ -156,10 +160,10 @@ steal(
                                             view: "datatable",
                                             id: _this.idTable,
                                             pager: _this.idPagerA,
-											rowHeight: 140,
+					    rowHeight: 140,
                                             columns: [
-                                                { "id": "activity", "header": "Activity", "width": 70, "filter_type": "number" },
-                                                { "id": "image", "header": "Image", "editor": "text", "template": function(obj) {
+                                                { "id": "activity", "header": "Activity", "width": 70, "filter_type": "number", "sort":"int" },
+                                                { "id": "image", "header": "Image", "editor": "text", "css": "imageCol", "template": function(obj) {
 
                                                 	if (obj.image) {
                                                 		return (
@@ -170,13 +174,13 @@ steal(
                                                 	} else {
                                                 		return "null";
                                                 	}
-                                                }, "width": 150 },
-                                                { "id": "caption", "header": "Caption", "editor": "text", "filter_type": "text", "fillspace": true },
-                                                { "id": "caption_govt", "header": "Caption (Govt)", "editor": "text", "filter_type": "text","fillspace": true },
-                                                { "id": "date", "header": "Date", "filter_type": "date","width": 100 },
-												{ "id": "status", "header": "Status", "filter_type": "text","width": 100 },
-												{ "id": "taggedPeople", "header": "Tagged people", "template": function(item) { return item.taggedPeopleNames.join(', '); }, "filter_type": "text", "filter_value": function(item) { return item.taggedPeopleNames.join(' '); }, "width": 140, "css": "fcfactivitymanager-column-tagged-people" },
-                                                { "id": "uploadedBy", "header": "Uploaded by", "template": "#displayName#", "filter_type": "text", "filter_value": function(r) { return r.displayName; }, "width": 140 },
+                                                }, "width": 172 },
+                                                { "id": "caption", "header": "Caption", "editor": "text", "filter_type": "text", "fillspace": true, "sort":"text" },
+                                                { "id": "caption_govt", "header": "Caption (Govt)", "editor": "text", "filter_type": "text","fillspace": true, "sort":"text" },
+                                                { "id": "date", "header": "Date", "filter_type": "date","width": 100, "sort":"text" },
+						{ "id": "status", "header": "Status", "filter_type": "text","width": 100, "sort":"text" },
+						{ "id": "taggedPeople", "header": "Tagged people", "template": function(item) { return item.taggedPeopleNames.join(', '); }, "filter_type": "text", "filter_value": function(item) { return item.taggedPeopleNames.join(' '); }, "width": 140, "css": "fcfactivitymanager-column-tagged-people" },
+                                                { "id": "uploadedBy", "header": "Uploaded by", "template": "#displayName#", "filter_type": "text", "filter_value": function(r) { return r.displayName; }, "width": 140, "sort":"text" },
 
                                                 // { id:"copy",  header:"" , width:40, css:{"text-align":"center"}, template:function(obj) { return "<div class='clone fa fa-copy fa-2 offset-9 rbac-role-list-clone' role-id='"+obj.id+"'  ></div>"; } } ,
                                                 { id: "trash", header: "", width: 40, css: { "text-align": "center" }, template: "<span class='trash'>{common.trashIcon()}</span>" }
@@ -290,13 +294,19 @@ steal(
 											size: 15,
 											group: 5
 										},
+                                                                                {
+                                                                                        view: "template",
+                                                                                        id: _this.idImagePreview,
+                                                                                        type: "form",
+                                                                                        height: 150
+                                                                                },
 
 										//// Begin Form
 
 										{
 											view: "form",
 											id: _this.idForm,
-											type: "line",
+											type: "form",
 											css: 'fcfactivitymanager-edit-form',
 											elementsConfig: {
 												labelPosition: "top",
@@ -306,10 +316,15 @@ steal(
 											},
 											elements: [
 												{ "view": "text", "label": "Activity", "name": "activity" },
-												{ "view": "text", "label": "Image", "name": "image", "type": "text" },
-												{ "view": "text", "label": "Caption", "name": "caption", "type": "text" },
-												{ "view": "text", "label": "Caption (Govt)", "name": "caption_govt", "type": "text" },
+												{ "view": "text", "label": "Image", "name": "image", "type": "text", "id": _this.idImage },
+												{ "view": "textarea", height: 150, "label": "Caption", "name": "caption", "type": "text" },
+												{ "view": "textarea", height: 150, "label": "Caption (Govt)", "name": "caption_govt", "type": "text" },
 												{ "view": "datepicker", "label": "Date", "name": "date", "timepicker": false },
+												{ "view": "select", "label": "Status", "name": "status", "type": "text", options:[
+        { "value":"new" },
+        { "value":"approved" },
+        { "value":"ready" }
+    ] },
 												{ "view": "text", "label": "Uploaded by", "name": "displayName", "id": _this.idUploadedBy }
 												// {
 												//     view:   "text",
@@ -333,7 +348,7 @@ steal(
 										},
 										{
 											id: _this.idFormButtons,
-											"type": "line",
+											"type": "form",
 											"rows": [
 												{
 													"type": "line",
@@ -422,6 +437,9 @@ steal(
 
 																			} else {
 																				_this.toList();
+																				if ($$("activity_images_filter_popup")) {
+																					$$("activity_images_filter_popup").filter();
+																				}
 																			}
 																		})
 
@@ -508,6 +526,7 @@ steal(
 						toList: function () {
 							$$(this.idToolbar).showBatch('list');
 							$$(this.idForm).hide();
+							$$(this.idImagePreview).hide();
 							$$(this.idFormButtons).hide();
 
 							$$(this.idTable).show();
@@ -606,8 +625,11 @@ steal(
 							form.show();
 
 							$$(this.idFormButtons).show();
+							$$(this.idImagePreview).show();
 
 							$$(this.idUploadedBy).disable();
+
+							$$(this.idImagePreview).setHTML("<img src='" + $$(this.idImage).getValue() + "' style='padding:8px 0 0 15px;' />");
 
 							$$(this.idTable).hide();
 							$$(this.idPagerA).hide();
