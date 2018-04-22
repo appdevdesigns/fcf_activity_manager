@@ -601,7 +601,8 @@ steal(
                         loadData: function () {
                             var _this = this;
 
-                            this.Model.findAll()
+                            var fiveMonthsAgo = moment().subtract(5, 'months').format("YYYY-MM-DD");
+                            this.Model.findAll({ date: { '>': fiveMonthsAgo }})
                                 .fail(function (err) {
                                     AD.error.log('crud1FCFActivity: Error loading Data', { error: err });
                                 })
