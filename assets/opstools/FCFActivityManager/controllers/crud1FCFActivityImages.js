@@ -176,7 +176,7 @@ steal(
                                                 	}
                                                 }, "width": 172 },
                                                 { "id": "caption", "header": "Caption", "editor": "text", "filter_type": "text", "fillspace": true, "sort":"text" },
-                                                { "id": "caption_govt", "header": "Caption (Govt)", "editor": "text", "filter_type": "text","fillspace": true, "sort":"text" },
+                                                { "id": "caption_govt", "header": "Location", "editor": "text", "filter_type": "text","fillspace": true, "sort":"text" },
                                                 { "id": "date", "header": "Date", "filter_type": "date","width": 100, "sort":"text" },
 						{ "id": "status", "header": "Status", "filter_type": "text","width": 100, "sort":"text" },
 						{ "id": "taggedPeople", "header": "Tagged people", "template": function(item) { return item.taggedPeopleNames.join(', '); }, "filter_type": "text", "filter_value": function(item) { return item.taggedPeopleNames.join(' '); }, "width": 140, "css": "fcfactivitymanager-column-tagged-people" },
@@ -318,7 +318,7 @@ steal(
 												{ "view": "text", "label": "Activity", "name": "activity" },
 												{ "view": "text", "label": "Image", "name": "image", "type": "text", "id": _this.idImage },
 												{ "view": "textarea", height: 150, "label": "Caption", "name": "caption", "type": "text" },
-												{ "view": "textarea", height: 150, "label": "Caption (Govt)", "name": "caption_govt", "type": "text" },
+												{ "view": "textarea", height: 150, "label": "Location", "name": "caption_govt", "type": "text" },
 												{ "view": "datepicker", "label": "Date", "name": "date", "timepicker": false },
 												{ "view": "select", "label": "Status", "name": "status", "type": "text", options:[
         { "value":"new" },
