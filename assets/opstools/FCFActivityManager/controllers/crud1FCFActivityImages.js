@@ -294,19 +294,16 @@ steal(
 											size: 15,
 											group: 5
 										},
-                                                                                {
-                                                                                        view: "template",
-                                                                                        id: _this.idImagePreview,
-                                                                                        type: "form",
-                                                                                        height: 150
-                                                                                },
-
+										{
+	                                            view: "template",
+	                                            id: _this.idImagePreview,
+	                                            height: 300
+	                                    },
 										//// Begin Form
-
 										{
 											view: "form",
 											id: _this.idForm,
-											type: "form",
+											type: "line",
 											css: 'fcfactivitymanager-edit-form',
 											elementsConfig: {
 												labelPosition: "top",
@@ -315,17 +312,118 @@ steal(
 												//                                }}
 											},
 											elements: [
-												{ "view": "text", "label": "Activity", "name": "activity" },
-												{ "view": "text", "label": "Image", "name": "image", "type": "text", "id": _this.idImage },
-												{ "view": "textarea", height: 150, "label": "Caption", "name": "caption", "type": "text" },
-												{ "view": "textarea", height: 150, "label": "Location", "name": "caption_govt", "type": "text" },
-												{ "view": "datepicker", "label": "Date", "name": "date", "timepicker": false },
-												{ "view": "select", "label": "Status", "name": "status", "type": "text", options:[
-        { "value":"new" },
-        { "value":"approved" },
-        { "value":"ready" }
-    ] },
-												{ "view": "text", "label": "Uploaded by", "name": "displayName", "id": _this.idUploadedBy }
+												{
+													type: "space",
+													cols:[
+														{},
+														{
+															gravity: 2,
+															rows:[
+																{ "view": "textarea", height: 150, "label": "Caption", "name": "caption", "type": "text" },
+																{ "view": "text", "label": "Location", "name": "caption_govt", "type": "text" },
+																{ "view": "datepicker", "label": "Date", "name": "date", "timepicker": false },
+																{ "view": "richselect", "label": "Status", "name": "status", "type": "text", options:[
+															        { "id":"new", "value":"New" },
+															        { "id":"approved", "value":"Approved" },
+															        { "id":"ready", "value":"Ready" },
+																	{ "id":"denied", "value":"Denied" }
+															    ] },
+																{ "view": "text", "label": "Uploaded by", "name": "displayName", "id": _this.idUploadedBy },
+																{ "view": "text", "disabled": true, "label": "Activity ID", "name": "activity" },
+																{ "view": "text", "disabled": true, "label": "Image", "name": "image", "type": "text", "id": _this.idImage },
+																{ height: 15 },
+																{
+																	id: _this.idFormButtons,
+																	"type": "line",
+																	"cols": [
+																		{
+																			"view": "button",
+																			"label": lblCancel,
+																			"width": 80,
+																			click: function () {
+
+																				_this.toList();
+
+																			}
+																		},
+																		// {
+																		// 	"view": "button",
+																		// 	id: "translateButton",
+																		// 	"label": lblTranslate,
+																		// 	"width": 160,
+																		// 	click: function () {
+																		// 		var model = _this.dataCollection.AD.currModel();
+																		// 		var form = $$(_this.idForm);
+																		// 		var values = form.getValues();
+																		// 		model.attr(values);
+																		// 		_this.addToTranslate(model);
+																		// 
+																		// 	}
+																		// },
+																		{},
+																		{
+																			"view": "button",
+																			"label": lblSave,
+																			"type": "form",
+																			"width": 80,
+																			click: function () {
+
+																				var isAdd = false;
+
+																				var form = $$(_this.idForm);
+																				if (form.validate()) {
+
+																					// if an update, then there is a current model
+																					var model = _this.dataCollection.AD.currModel();
+																					if (model == null) {
+
+																						// else this is a create operation:
+																						model = new _this.Model();
+																						isAdd = true;
+																					}
+																					var values = form.getValues();
+
+																					model.attr(values);
+																					model.save()
+																						.fail(function (err) {
+																							if (!AD.op.WebixForm.isValidationError(err, form)) {
+																								AD.error.log('Error saving current model ()', { error: err, values: values });
+																							}
+																						})
+																						.then(function (newData) {
+																							if (isAdd) {
+
+																								// the new model obj doesn't have the fully populated data
+																								// like a new read would, so perform a lookup and store that:
+																								_this.Model.findOne({ id: newData.getID() })
+																									.fail(function (err) {
+																										AD.error.log('Error looking up new model:', { error: err, newData: newData, id: newData.getID() })
+																									})
+																									.then(function (newModel) {
+																										if (newModel.translate) { newModel.translate(); }
+																										_this.data.unshift(newModel);
+																										_this.toList();
+																									})
+
+																							} else {
+																								_this.toList();
+																								if ($$("activity_images_filter_popup")) {
+																									$$("activity_images_filter_popup").filter();
+																								}
+																							}
+																						})
+
+																				}
+
+																			}
+																		}
+																	]
+																}
+															]
+														},
+														{}
+													]
+												}
 												// {
 												//     view:   "text",
 												//     label:  "Role Label",
@@ -346,114 +444,6 @@ steal(
 												// role_description: webix.rules.isNotEmpty
 											}
 										},
-										{
-											id: _this.idFormButtons,
-											"type": "form",
-											"rows": [
-												{
-													"type": "line",
-													"cols": [
-														{
-															"view": "button",
-															"label": lblCancel,
-															"width": 80,
-															click: function () {
-
-																_this.toList();
-
-															}
-														},
-														{
-															"view": "button",
-															id: "translateButton",
-															"label": lblTranslate,
-															"width": 160,
-															click: function () {
-																var model = _this.dataCollection.AD.currModel();
-																var form = $$(_this.idForm);
-																var values = form.getValues();
-																model.attr(values);
-																_this.addToTranslate(model);
-
-															}
-														},
-														/*
-														{
-															"view": "button",
-															"label": "Edit",
-															"width": 80,
-															click: function (){
-																	$("toolbar1").showBatch("batch3");
-																	$("addFormView").hide();
-																	$("addFormEdit").show();
-																	this.hide();
-																	$("$button1").show()
-																  
-															}
-														},
-														*/
-														{
-															"view": "button",
-															"label": lblSave,
-															"width": 80,
-															click: function () {
-
-																var isAdd = false;
-
-																var form = $$(_this.idForm);
-																if (form.validate()) {
-
-																	// if an update, then there is a current model
-																	var model = _this.dataCollection.AD.currModel();
-																	if (model == null) {
-
-																		// else this is a create operation:
-																		model = new _this.Model();
-																		isAdd = true;
-																	}
-																	var values = form.getValues();
-
-																	model.attr(values);
-																	model.save()
-																		.fail(function (err) {
-																			if (!AD.op.WebixForm.isValidationError(err, form)) {
-																				AD.error.log('Error saving current model ()', { error: err, values: values });
-																			}
-																		})
-																		.then(function (newData) {
-																			if (isAdd) {
-
-																				// the new model obj doesn't have the fully populated data
-																				// like a new read would, so perform a lookup and store that:
-																				_this.Model.findOne({ id: newData.getID() })
-																					.fail(function (err) {
-																						AD.error.log('Error looking up new model:', { error: err, newData: newData, id: newData.getID() })
-																					})
-																					.then(function (newModel) {
-																						if (newModel.translate) { newModel.translate(); }
-																						_this.data.unshift(newModel);
-																						_this.toList();
-																					})
-
-																			} else {
-																				_this.toList();
-																				if ($$("activity_images_filter_popup")) {
-																					$$("activity_images_filter_popup").filter();
-																				}
-																			}
-																		})
-
-																}
-
-															}
-														},
-														{
-															"view": "spacer"
-														}
-													]
-												}
-											]
-										}
 
                                         //// end form
 
@@ -629,7 +619,7 @@ steal(
 
 							$$(this.idUploadedBy).disable();
 
-							$$(this.idImagePreview).setHTML("<img src='" + $$(this.idImage).getValue() + "' style='padding:8px 0 0 15px;' />");
+							$$(this.idImagePreview).setHTML("<div style='background: #666; text-align: center;'><img src='" + $$(this.idImage).getValue().replace("_scaled", "_print") + "' style='height: 300px;' /></div>");
 
 							$$(this.idTable).hide();
 							$$(this.idPagerA).hide();

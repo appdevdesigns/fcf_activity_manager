@@ -392,154 +392,156 @@ steal(
                                                 //                                }}
                                             },
                                             elements: [
-                                                { "view": "text", "label": "Default image", "name": "default_image", "type": "text" },
-                                                { "view": "text", "label": "Name", "name": "activity_name", "type": "text", "required": false, "id": _this.idName },
-                                                { "view": "text", "label": "Name (Govt)", "name": "activity_name_govt", "type": "text", "required": false, "id": _this.idNameGovt },
-                                                { "view": "textarea", "label": "Description", "name": "activity_description", "height": 130, "type": "text", "required": false, "id": _this.idDescription },
-                                                { "view": "textarea", "label": "Description (Govt)", "name": "activity_description_govt", "height": 130, "type": "text", "required": false, "id": _this.idDescriptionGovt },
-                                                { "view": "text", "label": "Status", "name": "status", "type": "text" },
-                                                { "view": "datepicker", "label": "Start date", "name": "date_start", "timepicker": false },
-                                                { "view": "datepicker", "label": "End date", "name": "date_end", "timepicker": false },
-                                                { "view": "text", "label": "Team", "name": "team.NameMinistryEng", "required": false, "id": _this.idTeam },
-                                                { "view": "text", "label": "Approved by", "name": "approvedBy", "required": false, "id": _this.idApprovedBy },
-                                                { "view": "text", "label": "Created by", "name": "createdBy.NameFirstEng", "required": false, "id": _this.idCreatedBy },
-                                                { "view": "datepicker", "label": "Created at", "name": "createdAt", "timepicker": true, "id": _this.idCreatedAt },
-                                                { "view": "datepicker", "label": "Updated at", "name": "updatedAt", "timepicker": true, "id": _this.idUpdatedAt }
-                                                // {
-                                                //     view:   "text",
-                                                //     label:  "Role Label",
-                                                //     name:   "role_label",
-                                                //     type:   "text"
-                                                // },
-                                                // {
-                                                //     view:   "text",
-                                                //     label:  "Role Description",
-                                                //     name:   "role_description",
-                                                //     type:   "text"
-                                                // }
+                                                {
+                                                    type: "space",
+                                                    cols:[
+                                                        {},
+                                                        {
+                                                            gravity: 2,
+                                                            rows: [
+                                                                { "view": "text", "label": "Name", "name": "activity_name", "type": "text", "required": false, "id": _this.idName },
+                                                                { "view": "text", "label": "Name (Govt)", "name": "activity_name_govt", "type": "text", "required": false, "id": _this.idNameGovt },
+                                                                { "view": "textarea", "label": "Description", "name": "activity_description", "height": 130, "type": "text", "required": false, "id": _this.idDescription },
+                                                                { "view": "textarea", "label": "Description (Govt)", "name": "activity_description_govt", "height": 130, "type": "text", "required": false, "id": _this.idDescriptionGovt },
+                                                                {
+                                                                    cols: [
+                                                                        { "view": "richselect", "label": "Status", "name": "status", "options":[ { "id":"new", "value":"New"}, { "id":"approved", "value":"Approved"}, { "id":"denied", "value":"Denied"}, { "id":"translated", "value":"Translated"}, { "id":"ready", "value":"Ready"}, { "id":"updated", "value":"Updated" } ] },
+                                                                        { "width": 10 },
+                                                                        { "view": "datepicker", "label": "Start date", "name": "date_start", "timepicker": false },
+                                                                        { "width": 10 },
+                                                                        { "view": "datepicker", "label": "End date", "name": "date_end", "timepicker": false }
+                                                                    ]
+                                                                },
+                                                                { "view": "text", "disabled":true, "label": "Team", "name": "team.NameMinistryEng", "required": false, "id": _this.idTeam },
+                                                                {
+                                                                    cols: [
+                                                                        { "view": "text", "disabled":true, "label": "Approved by", "name": "approvedBy", "required": false, "id": _this.idApprovedBy },
+                                                                        { "width": 10 },
+                                                                        { "view": "text", "disabled":true, "label": "Created by", "name": "createdBy.NameFirstEng", "required": false, "id": _this.idCreatedBy }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    height: 25
+                                                                },
+                                                                {
+                                                                    id: _this.idFormButtons,
+                                                                    "type": "line",
+                                                                    "rows": [
+                                                                        {
+                                                                            "type": "line",
+                                                                            "cols": [
+                                                                                {
+                                                                                    "view": "button",
+                                                                                    "label": lblCancel,
+                                                                                    "width": 80,
+                                                                                    click: function () {
 
+                                                                                        _this.toList();
+
+                                                                                    }
+                                                                                },
+                                                                                {},
+                                                                                {
+                                                                                    "view": "button",
+                                                                                    "label": lblSave,
+                                                                                    "type": "form",
+                                                                                    "width": 80,
+                                                                                    click: function () {
+
+                                                                                        var isAdd = false;
+
+                                                                                        var form = $$(_this.idForm);
+                                                                                        if (form.validate()) {
+
+                                                                                            // if an update, then there is a current model
+                                                                                            var model = _this.dataCollection.AD.currModel();
+                                                                                            if (model == null) {
+
+                                                                                                // else this is a create operation:
+                                                                                                model = new _this.Model();
+                                                                                                isAdd = true;
+                                                                                            }
+                                                                                            var values = form.getValues();
+
+                                                                                            // make sure we only update the following fields:
+                                                                                            var fieldsAllowedToUpdate = [
+                                                                                                'date_start', 
+                                                                                                'date_end', 
+                                                                                                'status', 
+                                                                                                'activity_name', 
+                                                                                                'activity_name_govt', 
+                                                                                                'activity_description', 
+                                                                                                'activity_description_govt' 
+                                                                                            ];
+
+                                                                                            // remove embedded field references:
+                                                                                            for (var v in values) {
+                                                                                                if (fieldsAllowedToUpdate.indexOf(v) == -1) {
+                                                                                                    delete values[v];
+                                                                                                }
+                                                                                            }
+
+                                                                                            // don't send an invalid date_end value
+                                                                                            if (values.date_end == '') {
+                                                                                                delete values.date_end;
+                                                                                            }
+                                                                                            
+                                                                                            // Convert to YYYY-MM-DD for server storeage without timezone
+                                                                                            if (values.date_start)
+                                                                                                values.date_start = moment(values.date_start).locale('cst').format("YYYY-MM-DD");
+                                                                                            
+                                                                                            if (values.date_end)
+                                                                                                values.date_end = moment(values.date_end).locale('cst').format("YYYY-MM-DD");
+                                                                                                
+                                                                                            console.log(values);
+
+                                                                                            model.attr(values);
+                                                                                            model.save()
+                                                                                                .fail(function (err) {
+                                                                                                    if (!AD.op.WebixForm.isValidationError(err, form)) {
+                                                                                                        AD.error.log('Error saving current model ()', { error: err, values: values });
+                                                                                                    }
+                                                                                                })
+                                                                                                .then(function (newData) {
+                                                                                                    if (isAdd) {
+
+                                                                                                        // the new model obj doesn't have the fully populated data
+                                                                                                        // like a new read would, so perform a lookup and store that:
+                                                                                                        _this.Model.findOne({ id: newData.getID() })
+                                                                                                            .fail(function (err) {
+                                                                                                                AD.error.log('Error looking up new model:', { error: err, newData: newData, id: newData.getID() })
+                                                                                                            })
+                                                                                                            .then(function (newModel) {
+                                                                                                                _this.prepareEntry(newModel);
+                                                                                                                _this.data.unshift(newModel);
+                                                                                                                _this.toList();
+                                                                                                            })
+
+                                                                                                    } else {
+                                                                                                        _this.prepareEntry(model);
+                                                                                                        _this.toList();
+                                                                                                    }
+                                                                                                })
+
+                                                                                        }
+
+                                                                                    }
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {}
+                                                    ]
+                                                }
                                             ],
                                             rules: {
 
                                                 // role_label: webix.rules.isNotEmpty,
                                                 // role_description: webix.rules.isNotEmpty
                                             }
-                                        },
-                                        {
-                                            id: _this.idFormButtons,
-                                            "type": "line",
-                                            "rows": [
-                                                {
-                                                    "type": "line",
-                                                    "cols": [
-                                                        {
-                                                            "view": "button",
-                                                            "label": lblCancel,
-                                                            "width": 80,
-                                                            click: function () {
-
-                                                                _this.toList();
-
-                                                            }
-                                                        },
-                                                        /*
-                                                        {
-                                                            "view": "button",
-                                                            "label": "Edit",
-                                                            "width": 80,
-                                                            click: function (){
-                                                                    $("toolbar1").showBatch("batch3");
-                                                                    $("addFormView").hide();
-                                                                    $("addFormEdit").show();
-                                                                    this.hide();
-                                                                    $("$button1").show()
-                                                                  
-                                                            }
-                                                        },
-                                                        */
-                                                        {
-                                                            "view": "button",
-                                                            "label": lblSave,
-                                                            "width": 80,
-                                                            click: function () {
-
-                                                                var isAdd = false;
-
-                                                                var form = $$(_this.idForm);
-                                                                if (form.validate()) {
-
-                                                                    // if an update, then there is a current model
-                                                                    var model = _this.dataCollection.AD.currModel();
-                                                                    if (model == null) {
-
-                                                                        // else this is a create operation:
-                                                                        model = new _this.Model();
-                                                                        isAdd = true;
-                                                                    }
-                                                                    var values = form.getValues();
-
-                                                                    // make sure we only update the following fields:
-                                                                    var fieldsAllowedToUpdate = [
-                                                                        'date_start', 
-                                                                        'date_end', 
-                                                                        'default_image', 
-                                                                        'status', 
-                                                                        'activity_name', 
-                                                                        'activity_name_govt', 
-                                                                        'activity_description', 
-                                                                        'activity_description_govt' 
-                                                                    ];
-
-                                                                    // remove embedded field references:
-                                                                    for (var v in values) {
-                                                                        if (fieldsAllowedToUpdate.indexOf(v) == -1) {
-                                                                            delete values[v];
-                                                                        }
-                                                                    }
-
-                                                                    // don't send an invalid date_end value
-                                                                    if (values.date_end == '') {
-                                                                        delete values.date_end;
-                                                                    }
-
-                                                                    model.attr(values);
-                                                                    model.save()
-                                                                        .fail(function (err) {
-                                                                            if (!AD.op.WebixForm.isValidationError(err, form)) {
-                                                                                AD.error.log('Error saving current model ()', { error: err, values: values });
-                                                                            }
-                                                                        })
-                                                                        .then(function (newData) {
-                                                                            if (isAdd) {
-
-                                                                                // the new model obj doesn't have the fully populated data
-                                                                                // like a new read would, so perform a lookup and store that:
-                                                                                _this.Model.findOne({ id: newData.getID() })
-                                                                                    .fail(function (err) {
-                                                                                        AD.error.log('Error looking up new model:', { error: err, newData: newData, id: newData.getID() })
-                                                                                    })
-                                                                                    .then(function (newModel) {
-                                                                                        _this.prepareEntry(newModel);
-                                                                                        _this.data.unshift(newModel);
-                                                                                        _this.toList();
-                                                                                    })
-
-                                                                            } else {
-                                                                                _this.prepareEntry(model);
-                                                                                _this.toList();
-                                                                            }
-                                                                        })
-
-                                                                }
-
-                                                            }
-                                                        },
-                                                        {
-                                                            "view": "spacer",
-                                                        }
-                                                    ]
-                                                }
-                                            ]
                                         }
 
                                         //// end form
@@ -585,16 +587,16 @@ steal(
 
                             // Convert to date object
                             if (l.date_start)
-                                l.attr('date_start', moment(l.date_start).toDate());
-
+                                l.attr('date_start', moment.utc(l.date_start).locale('cst').toDate());
+                            
                             if (l.date_end)
-                                l.attr('date_end', moment(l.date_end).toDate());
-
+                                l.attr('date_end', moment.utc(l.date_end).locale('cst').toDate());
+                            
                             if (l.createdAt)
-                                l.attr('createdAt', moment(l.createdAt).toDate());
-
+                                l.attr('createdAt', moment.utc(l.createdAt).locale('cst').toDate());
+                            
                             if (l.updatedAt)
-                                l.attr('updatedAt', moment(l.updatedAt).toDate());
+                                l.attr('updatedAt', moment.utc(l.updatedAt).locale('cst').toDate());
                         },
 
 
@@ -606,6 +608,7 @@ steal(
                                     AD.error.log('crud1FCFActivity: Error loading Data', { error: err });
                                 })
                                 .then(function (list) {
+                                    console.log(list);
                                     // make sure they are all translated.
                                     list.forEach(function (l) {
 
@@ -646,7 +649,7 @@ steal(
                             $$(this.idFormButtons).show();
 
                             var selectedItem = $$(this.idTable).getItem($$(this.idTable).getSelectedId());
-
+                            
                             if (selectedItem) {
                                 var trans = $.grep(selectedItem.translations, function (t, index) {
                                     return t.language_code === AD.lang.currentLanguage;
