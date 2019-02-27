@@ -177,7 +177,7 @@ steal(
                                                 }, "width": 172 },
                                                 { "id": "caption", "header": "Caption", "editor": "text", "filter_type": "text", "fillspace": true, "sort":"text" },
                                                 { "id": "caption_govt", "header": "Location", "editor": "text", "filter_type": "text","fillspace": true, "sort":"text" },
-                                                { "id": "date", "header": "Date", "filter_type": "date","width": 100, "sort":"text" },
+                                                { "id": "date", "header": "Date", "filter_type": "date","width": 100, "format": webix.Date.dateToStr("%Y-%m-%d"), "sort":"text" },
 						{ "id": "status", "header": "Status", "filter_type": "text","width": 100, "sort":"text" },
 						{ "id": "taggedPeople", "header": "Tagged people", "template": function(item) { return item.taggedPeopleNames.join(', '); }, "filter_type": "text", "filter_value": function(item) { return item.taggedPeopleNames.join(' '); }, "width": 140, "css": "fcfactivitymanager-column-tagged-people" },
                                                 { "id": "uploadedBy", "header": "Uploaded by", "template": "#displayName#", "filter_type": "text", "filter_value": function(r) { return r.displayName; }, "width": 140, "sort":"text" },
@@ -382,7 +382,11 @@ steal(
 																						isAdd = true;
 																					}
 																					var values = form.getValues();
-
+																					
+																					// Convert to YYYY-MM-DD for server storeage without timezone
+																					if (values.date)
+																						values.date = moment(values.date).locale('cst').format("YYYY-MM-DD");
+																					
 																					model.attr(values);
 																					model.save()
 																						.fail(function (err) {
@@ -497,6 +501,9 @@ steal(
 									// make sure they are all translated.
 									list.forEach(function (l) {
 										if (l.translate) { l.translate(); }
+										
+										if (l.date)
+			                                l.attr('date', moment(l.date).locale('cst').toDate());
 
 										// Set full image url to image object
 										l.attr('fullImageUrl', l.getFullImageUrl());

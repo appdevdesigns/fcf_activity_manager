@@ -587,16 +587,16 @@ steal(
 
                             // Convert to date object
                             if (l.date_start)
-                                l.attr('date_start', moment.utc(l.date_start).locale('cst').toDate());
+                                l.attr('date_start', moment(l.date_start).locale('cst').toDate());
                             
                             if (l.date_end)
-                                l.attr('date_end', moment.utc(l.date_end).locale('cst').toDate());
+                                l.attr('date_end', moment(l.date_end).locale('cst').toDate());
                             
                             if (l.createdAt)
-                                l.attr('createdAt', moment.utc(l.createdAt).locale('cst').toDate());
+                                l.attr('createdAt', moment(l.createdAt).locale('cst').toDate());
                             
                             if (l.updatedAt)
-                                l.attr('updatedAt', moment.utc(l.updatedAt).locale('cst').toDate());
+                                l.attr('updatedAt', moment(l.updatedAt).locale('cst').toDate());
                         },
 
 
