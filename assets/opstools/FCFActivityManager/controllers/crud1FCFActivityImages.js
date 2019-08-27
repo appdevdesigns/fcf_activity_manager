@@ -48,6 +48,7 @@ steal(
                             this.idTable = ControllerName + "Table";
                             this.idPagerB = ControllerName + "PagerB";
                             this.idForm = ControllerName + "Form";
+							this.captionTrans = ControllerName + "captionTrans";
                             this.idFormButtons = this.idForm + "Buttons";
 
                             this.idUploadedBy = this.idForm + "UploadedBy";
@@ -224,7 +225,26 @@ steal(
                                                 onItemDblClick: function (id) {
 
                                                     _this.dataCollection.setCursor(id);
-                                                    _this.toForm();
+													
+													AD.comm.service.get({url:'/fcf_activities/originalactivityimage/'+id})
+													.fail(function(err) {
+														console.error('!!!! FCFActivities: error getting /fcf_activities/originalactivityimage/', err);
+													})
+													.then(function(data) {
+
+														if (data.data) {
+													
+															var trans = data.data;
+															
+															_this.toForm(trans);
+															
+														} else {
+															console.warn('... FCFActivities: /fcf_activities/originalactivityimage/ did not find an entry!');
+															_this.toForm();
+														}
+
+
+													});
 						
                                                 }
 
@@ -320,6 +340,7 @@ steal(
 															gravity: 2,
 															rows:[
 																{ "view": "textarea", height: 150, "label": "Caption", "name": "caption", "type": "text" },
+																{ id: _this.captionTrans, "view": "textarea", height: 150, disabled:true, "label": "Translated Caption", "name": "caption_readonly", "type": "text" },
 																{ "view": "text", "label": "Location", "name": "caption_govt", "type": "text" },
 																{ "view": "datepicker", "label": "Date", "name": "date", "timepicker": false },
 																{ "view": "richselect", "label": "Status", "name": "status", "type": "text", options:[
@@ -613,13 +634,28 @@ steal(
 							});
 						},
 
-						toForm: function () {
+						toForm: function (trans) {
 							$$(this.idToolbar).showBatch('form');
 
 							var form = $$(this.idForm);
 							form.clearValidation();
 
 							form.show();
+							
+							// We are going to get the translated value of the photo caption
+							// start with an empty string that we will replace if we find the translation
+							var transValue = "";
+							// if values are passed move forward
+							if (trans) {
+								// if we are using thai we want the english version otherwise just return the thai translation
+								langCode = (AD.lang.currentLanguage == "th") ? "en" : "th";
+								var translated = trans.translations.filter(function(currentValue) { return currentValue.language_code == langCode });
+								if (translated.length > 0) {
+									transValue = translated[0].caption;
+								}								
+							}
+							
+							$$(this.captionTrans).setValue(transValue);
 
 							$$(this.idFormButtons).show();
 							$$(this.idImagePreview).show();
