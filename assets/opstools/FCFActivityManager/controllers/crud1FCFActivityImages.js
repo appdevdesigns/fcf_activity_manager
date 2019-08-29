@@ -48,6 +48,7 @@ steal(
                             this.idTable = ControllerName + "Table";
                             this.idPagerB = ControllerName + "PagerB";
                             this.idForm = ControllerName + "Form";
+							this.caption = ControllerName + "caption";
 							this.captionTrans = ControllerName + "captionTrans";
                             this.idFormButtons = this.idForm + "Buttons";
 
@@ -339,7 +340,7 @@ steal(
 														{
 															gravity: 2,
 															rows:[
-																{ "view": "textarea", height: 150, "label": "Caption", "name": "caption", "type": "text" },
+																{ id: _this.caption, "view": "textarea", height: 150, "label": "Caption", "name": "caption", "type": "text" },
 																{ id: _this.captionTrans, "view": "textarea", height: 150, disabled:true, "label": "Translated Caption", "name": "caption_readonly", "type": "text" },
 																{ "view": "text", "label": "Location", "name": "caption_govt", "type": "text" },
 																{ "view": "datepicker", "label": "Date", "name": "date", "timepicker": false },
@@ -656,6 +657,10 @@ steal(
 							}
 							
 							$$(this.captionTrans).setValue(transValue);
+							$$(this.captionTrans).define("label", (AD.lang.currentLanguage == "th") ? "Caption (English)" : "Caption (Thai)");
+							$$(this.caption).define("label", (AD.lang.currentLanguage == "th") ? "Caption (Thai)" : "Caption (English)");
+							$$(this.captionTrans).refresh();
+							$$(this.caption).refresh();
 
 							$$(this.idFormButtons).show();
 							$$(this.idImagePreview).show();
