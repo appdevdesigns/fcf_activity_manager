@@ -50,6 +50,7 @@ steal(
                             this.idForm = ControllerName + "Form";
 							this.caption = ControllerName + "caption";
 							this.captionTrans = ControllerName + "captionTrans";
+							this.charcount = ControllerName + "charcount";
                             this.idFormButtons = this.idForm + "Buttons";
 
                             this.idUploadedBy = this.idForm + "UploadedBy";
@@ -340,7 +341,8 @@ steal(
 														{
 															gravity: 2,
 															rows:[
-																{ id: _this.caption, "view": "textarea", height: 150, "label": "Caption", "name": "caption", "type": "text" },
+																{ id: _this.caption, "view": "textarea", height: 150, "label": "Caption", "name": "caption", "type": "text", "attributes":{ "maxlength" :250 } },
+																{ view:"label", id: _this.charcount, label:"", align:"right"},
 																{ id: _this.captionTrans, "view": "textarea", height: 150, disabled:true, "label": "Translated Caption", "name": "caption_readonly", "type": "text" },
 																{ "view": "text", "label": "Location", "name": "caption_govt", "type": "text" },
 																{ "view": "datepicker", "label": "Date", "name": "date", "timepicker": false },
@@ -508,6 +510,7 @@ steal(
 
 							});
 
+
 						},
 
 
@@ -672,6 +675,21 @@ steal(
 							$$(this.idTable).hide();
 							$$(this.idPagerA).hide();
 							$$(this.idPagerB).hide();
+
+                                                        var count = $$(this.caption).getValue().length;
+                                                        $$(this.charcount).setValue(count+" of 250");
+
+                                                        var capID = this.caption;
+                                                        var countID = this.charcount;
+                                                        var hasKeyPress = $$(capID).hasEvent('onKeyPress');
+                                                        if (!hasKeyPress) {
+                                                          $$(capID).attachEvent("onKeyPress", function(){
+                                                            webix.delay(function(){
+                                                              var count = $$(capID).getValue().length;
+                                                              $$(countID).setValue(count+" of 250");
+                                                            });
+                                                          })
+                                                        }
 						},
 
 
