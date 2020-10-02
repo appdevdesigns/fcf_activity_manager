@@ -415,7 +415,8 @@ steal(
                                                                 },
                                                                 { "view": "text", "disabled":true, "label": "Team", "name": "team.NameMinistryEng", "required": false, "id": _this.idTeam },
                                                                 { "view": "text", "disabled":true, "label": "Created by", "name": "createdBy.NameFirstEng", "required": false, "id": _this.idCreatedBy },
-                                                                { "view": "textarea", "disabled":true, "label": "Objectives", "required": false, "height": 130, "id": _this.idObjectives },
+                                                                { "view": "label", "css": {"font-weight": "bold"}, "label": "Objectives" },
+                                                                { "view": "template", "type": "clean", "autoheight":true, "id": _this.idObjectives },
                                                                 {
                                                                     height: 25
                                                                 },
@@ -661,11 +662,15 @@ steal(
 
                                 $$(this.idTeam).setValue(selectedItem.team && selectedItem.team.NameMinistryEng ? selectedItem.team.NameMinistryEng : '');
                                 
-                                var objectives = "";
+                                var objectives = "<ul id='objList' class='list-group'>";
                                 selectedItem.objectives.forEach(function(obj) {
-                                    objectives = objectives + "• " + obj.ObjectiveDescEng.trim() + "\n";
+                                    objectives = objectives + "<li class='list-group-item disabled'>" + obj.ObjectiveDescEng.trim() + "</li>";
                                 });
-                                $$(this.idObjectives).setValue(objectives);
+                                objectives = objectives + "</ul>";
+                                $$(this.idObjectives).setHTML(objectives);
+                                var listHeight = document.getElementById("objList").offsetHeight;
+                                $$(this.idObjectives).define("height", listHeight);
+                                $$(this.idObjectives).resize();
 
                                 var createdBy = (selectedItem.createdBy.NameFirstEng ? selectedItem.createdBy.NameFirstEng + ' ' : '') +
                                     (selectedItem.createdBy.NameLastEng ? selectedItem.createdBy.NameLastEng + ' ' : '');
