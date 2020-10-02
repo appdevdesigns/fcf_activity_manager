@@ -55,10 +55,11 @@ steal(
                             this.idNameGovt = ControllerName + "idNameGovt";
                             this.idDescriptionGovt = ControllerName + "idDescriptionGovt";
                             this.idTeam = ControllerName + "idTeam";
-                            this.idApprovedBy = ControllerName + "ApprovedBy";
+                            this.idObjectives = ControllerName + "idObjectives";
+                            // this.idApprovedBy = ControllerName + "ApprovedBy";
                             this.idCreatedBy = ControllerName + "CreatedBy";
-                            this.idCreatedAt = ControllerName + "CreatedAt";
-                            this.idUpdatedAt = ControllerName + "UpdatedAt";
+                            // this.idCreatedAt = ControllerName + "CreatedAt";
+                            // this.idUpdatedAt = ControllerName + "UpdatedAt";
 
                             webix.ui({
                                 view: "filter_popup",
@@ -413,13 +414,8 @@ steal(
                                                                     ]
                                                                 },
                                                                 { "view": "text", "disabled":true, "label": "Team", "name": "team.NameMinistryEng", "required": false, "id": _this.idTeam },
-                                                                {
-                                                                    cols: [
-                                                                        { "view": "text", "disabled":true, "label": "Approved by", "name": "approvedBy", "required": false, "id": _this.idApprovedBy },
-                                                                        { "width": 10 },
-                                                                        { "view": "text", "disabled":true, "label": "Created by", "name": "createdBy.NameFirstEng", "required": false, "id": _this.idCreatedBy }
-                                                                    ]
-                                                                },
+                                                                { "view": "text", "disabled":true, "label": "Created by", "name": "createdBy.NameFirstEng", "required": false, "id": _this.idCreatedBy },
+                                                                { "view": "textarea", "disabled":true, "label": "Objectives", "required": false, "height": 130, "id": _this.idObjectives },
                                                                 {
                                                                     height: 25
                                                                 },
@@ -647,8 +643,8 @@ steal(
                             form.show();
 
                             $$(this.idFormButtons).show();
-
-                            var selectedItem = $$(this.idTable).getItem($$(this.idTable).getSelectedId());
+                            
+                            var selectedItem = $$(this.idTable).getItem(this.dataCollection.getCursor());
                             
                             if (selectedItem) {
                                 var trans = $.grep(selectedItem.translations, function (t, index) {
@@ -664,6 +660,12 @@ steal(
                                 }
 
                                 $$(this.idTeam).setValue(selectedItem.team && selectedItem.team.NameMinistryEng ? selectedItem.team.NameMinistryEng : '');
+                                
+                                var objectives = "";
+                                selectedItem.objectives.forEach(function(obj) {
+                                    objectives = objectives + "• " + obj.ObjectiveDescEng.trim() + "\n";
+                                });
+                                $$(this.idObjectives).setValue(objectives);
 
                                 var createdBy = (selectedItem.createdBy.NameFirstEng ? selectedItem.createdBy.NameFirstEng + ' ' : '') +
                                     (selectedItem.createdBy.NameLastEng ? selectedItem.createdBy.NameLastEng + ' ' : '');
@@ -672,10 +674,10 @@ steal(
                                 // $$(this.idApprovedBy).setValue('Approved');
 
                                 $$(this.idTeam).disable();
-                                $$(this.idApprovedBy).disable();
+                                // $$(this.idApprovedBy).disable();
                                 $$(this.idCreatedBy).disable();
-                                $$(this.idCreatedAt).disable();
-                                $$(this.idUpdatedAt).disable();
+                                // $$(this.idCreatedAt).disable();
+                                // $$(this.idUpdatedAt).disable();
                             }
 
                             $$(this.idTable).hide();
